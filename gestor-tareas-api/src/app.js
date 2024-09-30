@@ -9,15 +9,16 @@ const app = express();
 app.use(cors());  // Habilitamos CORS para permitir solicitudes desde otros dominios
 app.use(express.json());  // Middleware para que Express entienda JSON en las solicitudes que recibe
 
-// Definimos un puerto para nuestro servidor
+// Importamos las rutas de tareas
+const taskRoutes = require('./routes/taskRoutes');
+
+// Conectamos las rutas de tareas a nuestro servidor
+app.use('/api', taskRoutes);
+
+// Definimos el puerto
 const PORT = process.env.PORT || 5000;
 
 // Arrancamos el servidor
 app.listen(PORT, () => {
-    console.log(`Servidor corriendo en el puerto ${PORT}`);
-  });
-
-// Definimos la primera ruta: 'GET /'
-app.get('/', (req, res) => {
-    res.send('Bienvenido a la API del Gestor de Tareas');
-  });
+  console.log(`Servidor corriendo en el puerto ${PORT}`);
+});
