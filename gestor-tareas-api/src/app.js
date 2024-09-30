@@ -1,24 +1,28 @@
-// Importamos las librerías necesarias para el servidor
-const express = require('express');  // Framework que nos permite crear el servidor y definir rutas
-const cors = require('cors');  // Middleware que nos permite evitar problemas de seguridad al consumir la API desde otro dominio
+// Importamos las librerías necesarias
+const express = require('express');
+const cors = require('cors');
+const mongoose = require('mongoose');  // Mongoose para conectarnos a MongoDB
 
-// Creamos una aplicación de Express
 const app = express();
 
 // Middleware
-app.use(cors());  // Habilitamos CORS para permitir solicitudes desde otros dominios
-app.use(express.json());  // Middleware para que Express entienda JSON en las solicitudes que recibe
+app.use(cors());
+app.use(express.json());
 
-// Importamos las rutas de tareas
+// Conectar a MongoDB
+mongoose.connect('mongodb://localhost/gestor-tareas', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})
+.then(() => console.log('Conectado a MongoDB'))
+.catch(err => console.log('Error al conectar con MongoDB:', err));
+
+// Importamos las rutas
 const taskRoutes = require('./routes/taskRoutes');
-
-// Conectamos las rutas de tareas a nuestro servidor
 app.use('/api', taskRoutes);
 
-// Definimos el puerto
+// Definir puerto y arrancar servidor
 const PORT = process.env.PORT || 5000;
-
-// Arrancamos el servidor
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en el puerto ${PORT}`);
 });
