@@ -4,14 +4,20 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "concurrently \"npm run backend\" \"npm run frontend\"",
+    "backend": "nodemon src/app.js",
+    "frontend": "cd gestor-tareas-frontend && npm start"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "bootstrap": "^5.3.3",
     "cors": "^2.8.5",
     "express": "^4.21.0",
     "mongoose": "^8.7.0"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.1"
   }
 }

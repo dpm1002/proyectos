@@ -1,68 +1,65 @@
 import React, { useState } from 'react';
 import axios from 'axios';
+import { Container, Form, Button, Alert } from 'react-bootstrap';  // Importamos componentes de Bootstrap
 
 function AddTask() {
-  // Estado para manejar los datos del formulario
-  const [task, setTask] = useState({
-    title: '',
-    description: ''
-  });
-
+  const [task, setTask] = useState({ title: '', description: '' });
   const [message, setMessage] = useState('');
 
-  // Función para manejar los cambios en los inputs
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setTask({
-      ...task,
-      [name]: value
-    });
+    setTask({ ...task, [name]: value });
   };
 
-  // Función para manejar el envío del formulario
   const handleSubmit = (e) => {
-    e.preventDefault(); // Evita que el formulario recargue la página
+    e.preventDefault();
     axios.post('http://localhost:5000/api/tasks', task)
       .then(response => {
         setMessage('¡Tarea creada con éxito!');
-        setTask({ title: '', description: '' });  // Reseteamos el formulario
+        setTask({ title: '', description: '' });
       })
       .catch(error => {
-        console.error('Error al crear la tarea:', error);
         setMessage('Hubo un error al crear la tarea');
       });
   };
 
   return (
-    <div>
-      <h1>Añadir Nueva Tarea</h1>
+    <Container className="mt-5">
+      <h1 className="mb-4">Añadir Nueva Tarea</h1>
 
-      {message && <p>{message}</p>}
+      {/* Mostramos un mensaje de éxito o error */}
+      {message && <Alert variant={message.includes('éxito') ? 'success' : 'danger'}>{message}</Alert>}
 
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label htmlFor="title">Título:</label>
-          <input
+      <Form onSubmit={handleSubmit}>
+        <Form.Group controlId="formTitle">
+          <Form.Label>Título</Form.Label>
+          <Form.Control
             type="text"
-            id="title"
             name="title"
             value={task.title}
             onChange={handleChange}
+            placeholder="Introduce el título de la tarea"
             required
           />
-        </div>
-        <div>
-          <label htmlFor="description">Descripción:</label>
-          <textarea
-            id="description"
+        </Form.Group>
+
+        <Form.Group controlId="formDescription" className="mt-3">
+          <Form.Label>Descripción</Form.Label>
+          <Form.Control
+            as="textarea"
+            rows={3}
             name="description"
             value={task.description}
             onChange={handleChange}
-          ></textarea>
-        </div>
-        <button type="submit">Añadir Tarea</button>
-      </form>
-    </div>
+            placeholder="Descripción de la tarea (opcional)"
+          />
+        </Form.Group>
+
+        <Button variant="primary" type="submit" className="mt-3">
+          Añadir Tarea
+        </Button>
+      </Form>
+    </Container>
   );
 }
 
