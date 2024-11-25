@@ -17,6 +17,7 @@
                 <tr>
                     <th>ID</th>
                     <th>Monto</th>
+                    <th>Tipo de Ingreso</th>
                     <th>Descripción</th>
                 </tr>
             </thead>
@@ -25,11 +26,12 @@
                 <tr>
                     <td>{{ ingreso.id }}</td>
                     <td>{{ ingreso.amount }}</td>
+                    <td>{{ ingreso.type }}</td>
                     <td>{{ ingreso.description }}</td>
                 </tr>
                 {% else %}
                 <tr>
-                    <td colspan="3">No hay ingresos registrados.</td>
+                    <td colspan="4">No hay ingresos registrados.</td>
                 </tr>
                 {% endfor %}
             </tbody>
@@ -42,6 +44,7 @@
                 <tr>
                     <th>ID</th>
                     <th>Monto</th>
+                    <th>Tipo de gasto</th>
                     <th>Descripción</th>
                 </tr>
             </thead>
@@ -50,11 +53,12 @@
                 <tr>
                     <td>{{ gasto.id }}</td>
                     <td>{{ gasto.amount }}</td>
+                    <td>{{ gasto.type }}</td>
                     <td>{{ gasto.description }}</td>
                 </tr>
                 {% else %}
                 <tr>
-                    <td colspan="3">No hay gastos registrados.</td>
+                    <td colspan="4">No hay gastos registrados.</td>
                 </tr>
                 {% endfor %}
             </tbody>

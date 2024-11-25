@@ -220,3 +220,14 @@ table tbody tr:nth-child(even) {
 .close:hover {
     color: #000;
 }
+
+.button-container {
+    display: flex;             /* Habilita Flexbox */
+    flex-direction: column;    /* Coloca los botones en columna */
+    align-items: center;       /* Centra horizontalmente */
+    gap: 10px;                 /* Añade espacio entre botones */
+}
+
+.button-container button {
+    width: 150px;              /* Ancho fijo para todos los botones */
+}
