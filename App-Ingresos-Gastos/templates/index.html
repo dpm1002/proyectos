@@ -26,12 +26,11 @@
                     <label for="description">Descripción:</label>
                     <input type="text" name="description" required>
                     <label for="type">Tipo de ingreso:</label>
-                    <select name="type" required>
-                        <option value="trabajo">Trabajo</option>
-                        <option value="regalo">Regalo</option>
-                        <option value="freelance">Freelance</option>
-                        <option value="otros">Otros</option>
-                    </select>
+                    <label>Selecciona el tipo de ingreso:</label>
+                    <div id="income-type-buttons" class="button-list">
+                        <!-- Los botones se llenarán dinámicamente -->
+                    </div>
+                    <input type="hidden" name="type" id="income-type"> 
                     <label for="amount">Cantidad:</label>
                     <input type="number" name="amount" step="0.01" required>
                     <button type="submit">Agregar</button>
@@ -47,21 +46,10 @@
                     <label for="description">Descripción:</label>
                     <input type="text" name="description" required>
                     <label for="type">Tipo de gasto:</label>
-                    <select name="type" id="type" required>
-                        <option value="videogames">Videojuegos</option>
-                        <option value="food">Comida</option>
-                        <option value="car">Coche</option>
-                        <option value="tech">Tecnologia</option>
-                        <option value="ocio">Ocio</option>
-                        <option value="presents">Regalos</option>
-                        <option value="meets">Reuniones con amigos</option>
-                        <option value="party">Fiesta</option>
-                        <option value="sport">Deporte</option>
-                        <option value="services">Servicios</option>
-                        <option value="travel">Viajes</option>
-                        <option value="manga">Manga</option>
-                        <option value="Coffee">Cafe</option>
-                    </select>
+                    <div id="outcome-type-buttons" class="button-list">
+                        <!-- Los botones se llenarán dinámicamente -->
+                    </div>
+                    <input type="hidden" name="type" id="outcome-type"> 
                     <label for="amount">Cantidad:</label>
                     <input type="number" name="amount" step="0.01" required>
                     <button type="submit">Agregar</button>
@@ -101,6 +89,52 @@
         const deleteTransactionModal = document.getElementById('delete-transaction-modal');
         const openDeleteTransactionModal = document.getElementById('open-delete-modal');
         const closeDeleteTransactionModal = document.getElementById('close-delete-modal');
+
+        // Iconos de añadir income
+        const incomeTypes = [
+            { value: 'trabajo', label: 'Trabajo', icon: '💼' },
+            { value: 'regalo', label: 'Regalo', icon: '🎁' },
+            { value: 'freelance', label: 'Freelance', icon: '🖥️' },
+            { value: 'otros', label: 'Otros', icon: '📦' }
+        ];
+        
+        // Iconos de añadir outcome
+        const outcomeTypes = [
+            { value: 'videogames', label: 'Videojuegos', icon: '🎮' },
+            { value: 'food', label: 'Comida', icon: '🍔' },
+            { value: 'car', label: 'Coche', icon: '🚗' },
+            { value: 'tech', label: 'Tecnología', icon: '💻' },
+            { value: 'ocio', label: 'Ocio', icon: '🎭' },
+            { value: 'travel', label: 'Viajes', icon: '✈️' },
+            { value: 'otros', label: 'Otros', icon: '📦' }
+        ];
+
+        // Generar botones para los tipos
+        function createTypeButtons(containerId, typeFieldId, types) {
+            const container = document.getElementById(containerId);
+            const typeField = document.getElementById(typeFieldId);
+            container.innerHTML = ''; // Limpia los botones existentes
+
+            types.forEach(type => {
+                const button = document.createElement('button');
+                button.className = 'type-button';
+                button.innerHTML = `<span class="icon">${type.icon}</span>${type.label}`;
+                button.onclick = (e) => {
+                    e.preventDefault(); // Evitar que el botón envíe el formulario
+                    Array.from(container.children).forEach(btn => btn.classList.remove('selected'));
+                    button.classList.add('selected');
+                    typeField.value = type.value; // Establecer el valor seleccionado
+                };
+
+                container.appendChild(button);
+            });
+        }
+
+        // Llenar botones al cargar la página
+        document.addEventListener('DOMContentLoaded', () => {
+            createTypeButtons('income-type-buttons', 'income-type', incomeTypes);
+            createTypeButtons('outcome-type-buttons', 'outcome-type', outcomeTypes);
+        });
 
         // Abrir el modal de eliminar
         openDeleteTransactionModal.addEventListener('click', () => {

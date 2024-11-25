@@ -231,3 +231,81 @@ table tbody tr:nth-child(even) {
 .button-container button {
     width: 150px;              /* Ancho fijo para todos los botones */
 }
+
+.button-list {
+    display: flex;
+    flex-wrap: wrap; /* Permite que los botones se ajusten automáticamente */
+    gap: 10px; /* Espaciado entre botones */
+    margin: 20px 0;
+}
+
+.transaction-button {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.transaction-button:hover {
+    background-color: #e0e0e0;
+}
+
+.transaction-button .icon {
+    margin-right: 10px; /* Espaciado entre ícono y texto */
+    font-size: 18px;
+}
+
+.button-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 10px 0;
+}
+
+.type-button {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f9f9f9;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.type-button:hover {
+    background-color: #e0e0e0;
+}
+
+.type-button.selected {
+    background-color: #d4edda;
+}
+
+.type-button .icon {
+    margin-right: 10px;
+    font-size: 18px;
+}
+
+.type-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3px 8px;
+    font-size: 10px;
+    border: 1px solid #aaa;
+    border-radius: 3px;
+    background-color: #f1f1f1;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.type-button .icon {
+    margin-right: 3px;
+    font-size: 14px;
+}
