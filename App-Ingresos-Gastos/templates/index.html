@@ -99,14 +99,13 @@
                     transactionSelect.innerHTML = ''; // Limpiar opciones previas
                     data.forEach(transaction => {
                         const option = document.createElement('option');
-                        option.value = transaction[0]; // ID de la transacción
-                        option.textContent = `ID: ${transaction[0]} | ${transaction[1]} - ${transaction[2]} | ${transaction[3]}`;
+                        option.value = transaction.id; // Usar el ID de Firestore
+                        option.textContent = `ID: ${transaction.id} | ${transaction.type} - ${transaction.amount} | ${transaction.description}`;
                         transactionSelect.appendChild(option); // Añadir la opción al <select>
                     });
                 })
                 .catch(error => console.error('Error al cargar transacciones:', error));
         }
     </script>
-    
 </body>
 </html>
