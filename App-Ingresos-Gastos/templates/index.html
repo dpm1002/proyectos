@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Ingresos y Gastos</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Gestión de Ingresos y Gastos</h1>
+        <button id="open-add-modal">Añadir Transacción</button>
+        <button id="open-delete-modal">Eliminar Transacción</button>
+        <button onclick="window.location.href='/transacciones'">Ver Transacciones</button>
+        <button onclick="window.location.href='/graficos'">Ver Gráficos</button>
+
+        <!-- Modal para añadir transacciones -->
+        <div id="add-transaction-modal" class="modal">
+            <div class="modal-content">
+                <span id="close-add-modal" class="close">&times;</span>
+                <h2>Añadir Transacción</h2>
+                <form action="/add_transaction" method="post">
+                    <label for="type">Tipo:</label>
+                    <select name="type" id="type" required>
+                        <option value="income">Ingreso</option>
+                        <option value="expense">Gasto</option>
+                    </select>
+
+                    <label for="amount">Monto:</label>
+                    <input type="number" name="amount" id="amount" step="0.01" required>
+
+                    <label for="description">Descripción:</label>
+                    <input type="text" name="description" id="description">
+
+                    <button type="submit">Agregar</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Modal para eliminar transacciones -->
+        <div id="delete-transaction-modal" class="modal">
+            <div class="modal-content">
+                <span id="close-delete-modal" class="close">&times;</span>
+                <h2>Eliminar Transacción</h2>
+                <form action="/delete_transaction" method="post">
+                    <label for="transaction_id">Selecciona la Transacción:</label>
+                    <select name="transaction_id" id="transaction_id" required>
+                        <!-- Opciones se llenarán dinámicamente -->
+                    </select>
+                    <button type="submit">Eliminar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Modal para añadir transacciones
+        const addModal = document.getElementById('add-transaction-modal');
+        const openAddModal = document.getElementById('open-add-modal');
+        const closeAddModal = document.getElementById('close-add-modal');
+    
+        openAddModal.addEventListener('click', () => {
+            addModal.style.display = 'block';
+        });
+    
+        closeAddModal.addEventListener('click', () => {
+            addModal.style.display = 'none';
+        });
+    
+        // Modal para eliminar transacciones
+        const deleteModal = document.getElementById('delete-transaction-modal');
+        const openDeleteModal = document.getElementById('open-delete-modal');
+        const closeDeleteModal = document.getElementById('close-delete-modal');
+        const transactionSelect = document.getElementById('transaction_id'); // Selecciona el <select>
+    
+        openDeleteModal.addEventListener('click', () => {
+            deleteModal.style.display = 'block';
+            cargarTransacciones(); // Llamar a la función para llenar el desplegable
+        });
+    
+        closeDeleteModal.addEventListener('click', () => {
+            deleteModal.style.display = 'none';
+        });
+    
+        window.addEventListener('click', (event) => {
+            if (event.target === addModal) {
+                addModal.style.display = 'none';
+            }
+            if (event.target === deleteModal) {
+                deleteModal.style.display = 'none';
+            }
+        });
+    
+        // Función para cargar transacciones dinámicamente en el desplegable
+        function cargarTransacciones() {
+            fetch('/api/get_transactions') // Llama a la API creada en Flask
+                .then(response => response.json())
+                .then(data => {
+                    transactionSelect.innerHTML = ''; // Limpiar opciones previas
+                    data.forEach(transaction => {
+                        const option = document.createElement('option');
+                        option.value = transaction[0]; // ID de la transacción
+                        option.textContent = `ID: ${transaction[0]} | ${transaction[1]} - ${transaction[2]} | ${transaction[3]}`;
+                        transactionSelect.appendChild(option); // Añadir la opción al <select>
+                    });
+                })
+                .catch(error => console.error('Error al cargar transacciones:', error));
+        }
+    </script>
+    
+</body>
+</html>

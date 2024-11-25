@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ingresos y Gastos</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Transacciones</h1>
+
+        <!-- Tabla de Ingresos -->
+        <h2>Ingresos</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Monto</th>
+                    <th>Descripción</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ingreso in ingresos %}
+                <tr>
+                    <td>{{ ingreso[0] }}</td>
+                    <td>{{ ingreso[2] }}</td>
+                    <td>{{ ingreso[3] }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="3">No hay ingresos registrados.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Tabla de Gastos -->
+        <h2>Gastos</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Monto</th>
+                    <th>Descripción</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for gasto in gastos %}
+                <tr>
+                    <td>{{ gasto[0] }}</td>
+                    <td>{{ gasto[2] }}</td>
+                    <td>{{ gasto[3] }}</td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="3">No hay gastos registrados.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <button onclick="window.location.href='/'">Volver</button>
+    </div>
+</body>
+</html>
