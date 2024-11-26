@@ -17,15 +17,17 @@
                 <tr>
                     <th>ID</th>
                     <th>Monto</th>
+                    <th>Tipo de Ingreso</th>
                     <th>Descripción</th>
                 </tr>
             </thead>
             <tbody>
                 {% for ingreso in ingresos %}
                 <tr>
-                    <td>{{ ingreso[0] }}</td>
-                    <td>{{ ingreso[2] }}</td>
-                    <td>{{ ingreso[3] }}</td>
+                    <td>{{ ingreso.id }}</td>
+                    <td>{{ ingreso.amount }}</td>
+                    <td>{{ ingreso.type }}</td>
+                    <td>{{ ingreso.description }}</td>
                 </tr>
                 {% else %}
                 <tr>
@@ -42,15 +44,17 @@
                 <tr>
                     <th>ID</th>
                     <th>Monto</th>
+                    <th>Tipo de gasto</th>
                     <th>Descripción</th>
                 </tr>
             </thead>
             <tbody>
                 {% for gasto in gastos %}
                 <tr>
-                    <td>{{ gasto[0] }}</td>
-                    <td>{{ gasto[2] }}</td>
-                    <td>{{ gasto[3] }}</td>
+                    <td>{{ gasto.id }}</td>
+                    <td>{{ gasto.amount }}</td>
+                    <td>{{ gasto.type }}</td>
+                    <td>{{ gasto.description }}</td>
                 </tr>
                 {% else %}
                 <tr>

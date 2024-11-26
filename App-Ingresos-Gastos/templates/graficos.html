@@ -10,14 +10,21 @@
 <body>
     <div class="container">
         <h1>Estadísticas</h1>
+
+        <!-- Gráfico de Ingresos vs Gastos -->
         <canvas id="incomeExpenseChart"></canvas>
+
+        <!-- Gráfico de Ingresos por Categoría -->
         <canvas id="incomeCategoryChart"></canvas>
+
+        <!-- Gráfico de Gastos por Categoría -->
         <canvas id="expenseCategoryChart"></canvas>
+
         <button onclick="window.location.href='/'">Volver</button>
     </div>
 
     <script>
-        // Gráfico de ingresos vs gastos
+        // Gráfico de Ingresos vs Gastos
         const incomeExpenseChart = new Chart(document.getElementById('incomeExpenseChart').getContext('2d'), {
             type: 'doughnut',
             data: {
@@ -38,7 +45,7 @@
             }
         });
 
-        // Gráfico de ingresos por categoría
+        // Gráfico de Ingresos por Categoría
         const incomeCategoryChart = new Chart(document.getElementById('incomeCategoryChart').getContext('2d'), {
             type: 'bar',
             data: {
@@ -60,7 +67,7 @@
             }
         });
 
-        // Gráfico de gastos por categoría
+        // Gráfico de Gastos por Categoría
         const expenseCategoryChart = new Chart(document.getElementById('expenseCategoryChart').getContext('2d'), {
             type: 'bar',
             data: {
