@@ -1,0 +1,16 @@
+# Claves privadas de Firebase
+serviceAccountKey.json
+
+# Archivos y carpetas de configuración local
+*.env
+.DS_Store
+__pycache__/
+*.pyc
+
+# Archivos de logs
+*.log
+
+# Configuración de IDEs y sistemas operativos
+.vscode/
+.idea/
+Thumbs.db

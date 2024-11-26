@@ -9,35 +9,55 @@
 <body>
     <div class="container">
         <h1>Gestión de Ingresos y Gastos</h1>
-        <button id="open-add-modal">Añadir Transacción</button>
-        <button id="open-delete-modal">Eliminar Transacción</button>
-        <button onclick="window.location.href='/transacciones'">Ver Transacciones</button>
-        <button onclick="window.location.href='/graficos'">Ver Gráficos</button>
-
-        <!-- Modal para añadir transacciones -->
-        <div id="add-transaction-modal" class="modal">
+        <div class="button-container">
+            <button id="open-add-income-modal">Añadir Ingreso</button>
+            <button id="open-add-outcome-modal">Añadir Gasto</button>
+            <button id="open-delete-modal">Eliminar Transacción</button>
+            <button onclick="window.location.href='/transacciones'">Ver Transacciones</button>
+            <button onclick="window.location.href='/graficos'">Ver Gráficos</button>
+        </div>
+        
+        
+        <div id="add-income-modal" class="modal">
             <div class="modal-content">
-                <span id="close-add-modal" class="close">&times;</span>
-                <h2>Añadir Transacción</h2>
-                <form action="/add_transaction" method="post">
-                    <label for="type">Tipo:</label>
-                    <select name="type" id="type" required>
-                        <option value="income">Ingreso</option>
-                        <option value="expense">Gasto</option>
-                    </select>
-
-                    <label for="amount">Monto:</label>
-                    <input type="number" name="amount" id="amount" step="0.01" required>
-
+                <span id="close-add-income-modal" class="close">&times;</span>
+                <h2>Añadir Ingreso</h2>
+                <form action="/add_income" method="post">
                     <label for="description">Descripción:</label>
-                    <input type="text" name="description" id="description">
-
+                    <input type="text" name="description" required>
+                    <label for="type">Tipo de ingreso:</label>
+                    <label>Selecciona el tipo de ingreso:</label>
+                    <div id="income-type-buttons" class="button-list">
+                        <!-- Los botones se llenarán dinámicamente -->
+                    </div>
+                    <input type="hidden" name="type" id="income-type"> 
+                    <label for="amount">Cantidad:</label>
+                    <input type="number" name="amount" step="0.01" required>
                     <button type="submit">Agregar</button>
                 </form>
             </div>
         </div>
-
-        <!-- Modal para eliminar transacciones -->
+        
+        <div id="add-outcome-modal" class="modal">
+            <div class="modal-content">
+                <span id="close-add-outcome-modal" class="close">&times;</span>
+                <h2>Añadir Gasto</h2>
+                <form action="/add_outcome" method="post">
+                    <label for="description">Descripción:</label>
+                    <input type="text" name="description" required>
+                    <label for="type">Tipo de gasto:</label>
+                    <div id="outcome-type-buttons" class="button-list">
+                        <!-- Los botones se llenarán dinámicamente -->
+                    </div>
+                    <input type="hidden" name="type" id="outcome-type"> 
+                    <label for="amount">Cantidad:</label>
+                    <input type="number" name="amount" step="0.01" required>
+                    <button type="submit">Agregar</button>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Modal para eliminar transacción -->
         <div id="delete-transaction-modal" class="modal">
             <div class="modal-content">
                 <span id="close-delete-modal" class="close">&times;</span>
@@ -45,68 +65,160 @@
                 <form action="/delete_transaction" method="post">
                     <label for="transaction_id">Selecciona la Transacción:</label>
                     <select name="transaction_id" id="transaction_id" required>
-                        <!-- Opciones se llenarán dinámicamente -->
+                        <!-- Opciones se llenan dinámicamente -->
                     </select>
+                    <input type="hidden" name="collection" id="collection"> <!-- Campo oculto para la colección -->
                     <button type="submit">Eliminar</button>
                 </form>
             </div>
         </div>
+        
+
     </div>
 
     <script>
-        // Modal para añadir transacciones
-        const addModal = document.getElementById('add-transaction-modal');
-        const openAddModal = document.getElementById('open-add-modal');
-        const closeAddModal = document.getElementById('close-add-modal');
-    
-        openAddModal.addEventListener('click', () => {
-            addModal.style.display = 'block';
+        // Modales y botones
+        const addIncomeModal = document.getElementById('add-income-modal');
+        const addOutcomeModal = document.getElementById('add-outcome-modal');
+        const openAddIncomeModal = document.getElementById('open-add-income-modal');
+        const openAddOutcomeModal = document.getElementById('open-add-outcome-modal');
+        const closeAddIncomeModal = document.getElementById('close-add-income-modal');
+        const closeAddOutcomeModal = document.getElementById('close-add-outcome-modal');
+
+        // Referencias al modal y botones de eliminar
+        const deleteTransactionModal = document.getElementById('delete-transaction-modal');
+        const openDeleteTransactionModal = document.getElementById('open-delete-modal');
+        const closeDeleteTransactionModal = document.getElementById('close-delete-modal');
+
+        // Iconos de añadir income
+        const incomeTypes = [
+            { value: 'trabajo', label: 'Trabajo', icon: '💼' },
+            { value: 'regalo', label: 'Regalo', icon: '🎁' },
+            { value: 'freelance', label: 'Freelance', icon: '🖥️' },
+            { value: 'otros', label: 'Otros', icon: '📦' }
+        ];
+        
+        // Iconos de añadir outcome
+        const outcomeTypes = [
+            { value: 'videogames', label: 'Videojuegos', icon: '🎮' },
+            { value: 'food', label: 'Comida', icon: '🍔' },
+            { value: 'car', label: 'Coche', icon: '🚗' },
+            { value: 'tech', label: 'Tecnología', icon: '💻' },
+            { value: 'ocio', label: 'Ocio', icon: '🎭' },
+            { value: 'travel', label: 'Viajes', icon: '✈️' },
+            { value: 'otros', label: 'Otros', icon: '📦' }
+        ];
+
+        // Generar botones para los tipos
+        function createTypeButtons(containerId, typeFieldId, types) {
+            const container = document.getElementById(containerId);
+            const typeField = document.getElementById(typeFieldId);
+            container.innerHTML = ''; // Limpia los botones existentes
+
+            types.forEach(type => {
+                const button = document.createElement('button');
+                button.className = 'type-button';
+                button.innerHTML = `<span class="icon">${type.icon}</span>${type.label}`;
+                button.onclick = (e) => {
+                    e.preventDefault(); // Evitar que el botón envíe el formulario
+                    Array.from(container.children).forEach(btn => btn.classList.remove('selected'));
+                    button.classList.add('selected');
+                    typeField.value = type.value; // Establecer el valor seleccionado
+                };
+
+                container.appendChild(button);
+            });
+        }
+
+        // Llenar botones al cargar la página
+        document.addEventListener('DOMContentLoaded', () => {
+            createTypeButtons('income-type-buttons', 'income-type', incomeTypes);
+            createTypeButtons('outcome-type-buttons', 'outcome-type', outcomeTypes);
         });
-    
-        closeAddModal.addEventListener('click', () => {
-            addModal.style.display = 'none';
+
+        // Abrir el modal de eliminar
+        openDeleteTransactionModal.addEventListener('click', () => {
+            deleteTransactionModal.style.display = 'block';
+            cargarTransacciones(); // Llenar dinámicamente las transacciones al abrir
         });
-    
-        // Modal para eliminar transacciones
-        const deleteModal = document.getElementById('delete-transaction-modal');
-        const openDeleteModal = document.getElementById('open-delete-modal');
-        const closeDeleteModal = document.getElementById('close-delete-modal');
-        const transactionSelect = document.getElementById('transaction_id'); // Selecciona el <select>
-    
-        openDeleteModal.addEventListener('click', () => {
-            deleteModal.style.display = 'block';
-            cargarTransacciones(); // Llamar a la función para llenar el desplegable
+
+        // Cerrar el modal de eliminar
+        closeDeleteTransactionModal.addEventListener('click', () => {
+            deleteTransactionModal.style.display = 'none';
         });
-    
-        closeDeleteModal.addEventListener('click', () => {
-            deleteModal.style.display = 'none';
-        });
-    
+
+        // Cerrar al hacer clic fuera del modal
         window.addEventListener('click', (event) => {
-            if (event.target === addModal) {
-                addModal.style.display = 'none';
-            }
-            if (event.target === deleteModal) {
-                deleteModal.style.display = 'none';
+            if (event.target === deleteTransactionModal) {
+                deleteTransactionModal.style.display = 'none';
             }
         });
-    
-        // Función para cargar transacciones dinámicamente en el desplegable
+
+
+        // Abrir modal de ingreso
+        openAddIncomeModal.addEventListener('click', () => {
+            addIncomeModal.style.display = 'block';
+        });
+
+        // Abrir modal de gasto
+        openAddOutcomeModal.addEventListener('click', () => {
+            addOutcomeModal.style.display = 'block';
+        });
+
+        // Cerrar modal de ingreso
+        closeAddIncomeModal.addEventListener('click', () => {
+            addIncomeModal.style.display = 'none';
+        });
+
+        // Cerrar modal de gasto
+        closeAddOutcomeModal.addEventListener('click', () => {
+            addOutcomeModal.style.display = 'none';
+        });
+
+        // Cerrar al hacer clic fuera del modal
+        window.addEventListener('click', (event) => {
+            if (event.target === addIncomeModal) {
+                addIncomeModal.style.display = 'none';
+            }
+            if (event.target === addOutcomeModal) {
+                addOutcomeModal.style.display = 'none';
+            }
+        });
+
         function cargarTransacciones() {
-            fetch('/api/get_transactions') // Llama a la API creada en Flask
+            fetch('/api/get_transactions') // API para obtener transacciones combinadas
                 .then(response => response.json())
                 .then(data => {
-                    transactionSelect.innerHTML = ''; // Limpiar opciones previas
+                    const transactionSelect = document.getElementById('transaction_id');
+                    const collectionField = document.getElementById('collection');
+                    transactionSelect.innerHTML = ''; // Limpia opciones previas
+
+                    // Llenar selector con transacciones
                     data.forEach(transaction => {
                         const option = document.createElement('option');
-                        option.value = transaction[0]; // ID de la transacción
-                        option.textContent = `ID: ${transaction[0]} | ${transaction[1]} - ${transaction[2]} | ${transaction[3]}`;
-                        transactionSelect.appendChild(option); // Añadir la opción al <select>
+                        option.value = transaction.id; // ID único de la transacción
+                        option.textContent = `ID: ${transaction.id} | ${transaction.type} - ${transaction.amount} | ${transaction.description}`;
+                        option.dataset.collection = transaction.collection; // Agregar la colección como dataset
+                        transactionSelect.appendChild(option);
                     });
+
+                    // Ajustar el campo oculto `collection` al seleccionar una opción
+                    transactionSelect.addEventListener('change', () => {
+                        const selectedOption = transactionSelect.options[transactionSelect.selectedIndex];
+                        collectionField.value = selectedOption.dataset.collection; // Setear el valor de la colección
+                    });
+
+                    // Forzar actualización inicial para el campo oculto
+                    if (transactionSelect.options.length > 0) {
+                        const firstOption = transactionSelect.options[0];
+                        collectionField.value = firstOption.dataset.collection;
+                    }
                 })
                 .catch(error => console.error('Error al cargar transacciones:', error));
         }
-    </script>
-    
+
+
+
+    </script>    
 </body>
 </html>
