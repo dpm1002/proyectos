@@ -1,125 +1,202 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Gestión de Ingresos y Gastos',
       theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // TRY THIS: Try running your application with "flutter run". You'll see
-        // the application has a purple toolbar. Then, without quitting the app,
-        // try changing the seedColor in the colorScheme below to Colors.green
-        // and then invoke "hot reload" (save your changes or press the "hot
-        // reload" button in a Flutter-supported IDE, or press "r" if you used
-        // the command line to start the app).
-        //
-        // Notice that the counter didn't reset back to zero; the application
-        // state is not lost during the reload. To reset the state, use hot
-        // restart instead.
-        //
-        // This works for code too, not just values: Most code changes can be
-        // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+        primarySwatch: Colors.blue,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: HomePage(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
-
-  // This widget is the home page of your application. It is stateful, meaning
-  // that it has a State object (defined below) that contains fields that affect
-  // how it looks.
-
-  // This class is the configuration for the state. It holds the values (in this
-  // case the title) provided by the parent (in this case the App widget) and
-  // used by the build method of the State. Fields in a Widget subclass are
-  // always marked "final".
-
-  final String title;
-
+class HomePage extends StatefulWidget {
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  _HomePageState createState() => _HomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
+class _HomePageState extends State<HomePage> {
+  int _selectedIndex = 0;
 
-  void _incrementCounter() {
+  final List<Widget> _pages = [
+    AddTransactionPage(),
+    TransactionsPage(),
+    GraphsPage(),
+  ];
+
+  void _onItemTapped(int index) {
     setState(() {
-      // This call to setState tells the Flutter framework that something has
-      // changed in this State, which causes it to rerun the build method below
-      // so that the display can reflect the updated values. If we changed
-      // _counter without calling setState(), then the build method would not be
-      // called again, and so nothing would appear to happen.
-      _counter++;
+      _selectedIndex = index;
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
-    //
-    // The Flutter framework has been optimized to make rerunning build methods
-    // fast, so that you can just rebuild anything that needs updating rather
-    // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // TRY THIS: Try changing the color here to a specific color (to
-        // Colors.amber, perhaps?) and trigger a hot reload to see the AppBar
-        // change color while the other colors stay the same.
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+        title: Text('Gestión de Ingresos y Gastos'),
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          // Column is also a layout widget. It takes a list of children and
-          // arranges them vertically. By default, it sizes itself to fit its
-          // children horizontally, and tries to be as tall as its parent.
-          //
-          // Column has various properties to control how it sizes itself and
-          // how it positions its children. Here we use mainAxisAlignment to
-          // center the children vertically; the main axis here is the vertical
-          // axis because Columns are vertical (the cross axis would be
-          // horizontal).
-          //
-          // TRY THIS: Invoke "debug painting" (choose the "Toggle Debug Paint"
-          // action in the IDE, or press "p" in the console), to see the
-          // wireframe for each widget.
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
-        ),
+      body: _pages[_selectedIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.add),
+            label: 'Añadir',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.list),
+            label: 'Ver Transacciones',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.bar_chart),
+            label: 'Gráficas',
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        selectedItemColor: Colors.blue,
+        onTap: _onItemTapped,
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+    );
+  }
+}
+
+class AddTransactionPage extends StatelessWidget {
+  final TextEditingController _descriptionController = TextEditingController();
+  final TextEditingController _amountController = TextEditingController();
+
+  Future<void> _addTransaction(String type) async {
+    await FirebaseFirestore.instance
+        .collection(type == 'income' ? 'incomes' : 'expenses')
+        .add({
+      'description': _descriptionController.text,
+      'amount': double.parse(_amountController.text),
+      'type': type,
+      'timestamp': FieldValue.serverTimestamp(),
+    });
+    print('$type añadido correctamente');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        children: [
+          TextField(
+            controller: _descriptionController,
+            decoration: InputDecoration(labelText: 'Descripción'),
+          ),
+          TextField(
+            controller: _amountController,
+            decoration: InputDecoration(labelText: 'Cantidad'),
+            keyboardType: TextInputType.number,
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              ElevatedButton(
+                onPressed: () => _addTransaction('income'),
+                child: Text('Añadir Ingreso'),
+              ),
+              ElevatedButton(
+                onPressed: () => _addTransaction('expense'),
+                child: Text('Añadir Gasto'),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class TransactionsPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collectionGroup('transactions')
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        } else if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+          return Center(child: Text('No hay transacciones registradas'));
+        } else {
+          final transactions = snapshot.data!.docs;
+          return ListView.builder(
+            itemCount: transactions.length,
+            itemBuilder: (context, index) {
+              final transaction = transactions[index];
+              final data = transaction.data() as Map<String, dynamic>;
+              return ListTile(
+                title: Text(data['description']),
+                subtitle: Text('${data['type']} - ${data['amount']}'),
+                trailing: IconButton(
+                  icon: Icon(Icons.delete),
+                  onPressed: () async {
+                    await transaction.reference.delete();
+                    print('Transacción eliminada');
+                  },
+                ),
+              );
+            },
+          );
+        }
+      },
+    );
+  }
+}
+
+class GraphsPage extends StatelessWidget {
+  Future<Map<String, double>> _fetchGraphData(String collection) async {
+    final snapshot =
+        await FirebaseFirestore.instance.collection(collection).get();
+    Map<String, double> data = {};
+    for (var doc in snapshot.docs) {
+      final description = doc['description'];
+      final amount = doc['amount'];
+      data[description] = (data[description] ?? 0) + amount;
+    }
+    return data;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<Map<String, double>>(
+      future: _fetchGraphData('expenses'), // Cambiar a 'incomes' para ingresos
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Error: ${snapshot.error}'));
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return Center(child: Text('No hay datos para mostrar'));
+        } else {
+          final data = snapshot.data!;
+          return ListView(
+            children: data.entries.map((entry) {
+              return ListTile(
+                title: Text(entry.key),
+                trailing: Text(entry.value.toStringAsFixed(2)),
+              );
+            }).toList(),
+          );
+        }
+      },
     );
   }
 }
