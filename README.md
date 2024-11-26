@@ -19,12 +19,12 @@ En este repositorio me centro en mis proyectos personales, trabajos y codigos co
 | Dart | App-Ingresos-Gastos |
 | React | gestor-tareas-api |
 | Flutter | App-Ingresos-Gastos |
+| C# | TecladoChino - Copia | 
 
 #### Lenguajes a usar
 
 | Lenguaje | Proyecto     |
 | :-------- | :------- | 
-| C# | Aplicación windows | 
 | SpringBoot | Aplicacion con Java | 
 | PHP | Pagina web | 
 | TypeScript | Algun proyecto con JavaScript de ayuda | 
