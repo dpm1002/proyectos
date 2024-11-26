@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "486708070774",
+    "project_id": "appingresosgastos",
+    "storage_bucket": "appingresosgastos.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:486708070774:android:1b7e6d8790448e81219257",
+        "android_client_info": {
+          "package_name": "com.david.app_ingresos_gastos"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAHFi5Mn4LjnWCMwA-IW8CWDGMI_5EA7rU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
