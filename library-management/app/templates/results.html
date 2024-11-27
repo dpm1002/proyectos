@@ -1,16 +1,25 @@
-{% for book in books %}
-    <div>
-        <h3>{{ book.volumeInfo.title }}</h3>
-        <p>Autor: {{ book.volumeInfo.authors[0] }}</p>
-        <p>Serie: {{ book.volumeInfo.series or "No especificada" }}</p>
-        <form method="POST" action="/add_book">
-            <input type="hidden" name="title" value="{{ book.volumeInfo.title }}">
-            <input type="hidden" name="author" value="{{ book.volumeInfo.authors[0] }}">
-            <input type="hidden" name="series" value="{{ book.volumeInfo.series or "" }}">
-            <input type="hidden" name="published_date" value="{{ book.volumeInfo.publishedDate or "" }}">
-            <input type="hidden" name="description" value="{{ book.volumeInfo.description or "" }}">
-            <input type="hidden" name="image_url" value="{{ book.volumeInfo.imageLinks.thumbnail if book.volumeInfo.imageLinks else '' }}">
-            <button type="submit">Guardar</button>
-        </form>
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Resultados de la Búsqueda</h1>
+<div class="row">
+    {% for book in books %}
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <img src="{{ book.volumeInfo.imageLinks.thumbnail if book.volumeInfo.imageLinks else '/static/no_image.png' }}" class="card-img-top" alt="Portada">
+            <div class="card-body">
+                <h5 class="card-title">{{ book.volumeInfo.title }}</h5>
+                <p class="card-text">Autor: {{ book.volumeInfo.authors[0] if book.volumeInfo.authors else "Desconocido" }}</p>
+                <form method="POST" action="/add_book">
+                    <input type="hidden" name="title" value="{{ book.volumeInfo.title }}">
+                    <input type="hidden" name="author" value="{{ book.volumeInfo.authors[0] if book.volumeInfo.authors else 'Desconocido' }}">
+                    <input type="hidden" name="description" value="{{ book.volumeInfo.description or '' }}">
+                    <input type="hidden" name="image_url" value="{{ book.volumeInfo.imageLinks.thumbnail if book.volumeInfo.imageLinks else '' }}">
+                    <button type="submit" class="btn btn-success">Guardar</button>
+                </form>
+            </div>
+        </div>
     </div>
-{% endfor %}
+    {% endfor %}
+</div>
+{% endblock %}

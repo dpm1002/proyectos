@@ -1,4 +1,13 @@
-<form method="POST" action="/search">
-    <input type="text" name="query" placeholder="Buscar libros..." required>
-    <button type="submit">Buscar</button>
-</form>
+{% extends "base.html" %}
+
+{% block content %}
+<div class="text-center">
+    <h1>Busca un Libro</h1>
+    <form method="POST" action="/search" class="mt-4">
+        <div class="mb-3">
+            <input type="text" class="form-control" name="query" placeholder="Título o autor..." required>
+        </div>
+        <button type="submit" class="btn btn-primary">Buscar</button>
+    </form>
+</div>
+{% endblock %}
