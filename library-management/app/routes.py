@@ -35,3 +35,7 @@ def add_book():
 def library():
     books = Book.query.all()
     return render_template("library.html", books=books)
+
+@bp.route("/libros")
+def libros():
+    return render_template("libros.html")
