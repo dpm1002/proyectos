@@ -19,7 +19,7 @@ En este repositorio me centro en mis proyectos personales, trabajos y codigos co
 | Dart | App-Ingresos-Gastos |
 | React | gestor-tareas-api |
 | Flutter | App-Ingresos-Gastos |
-| C# | TecladoChino - Copia | 
+| C# | factorio-simulator | 
 
 #### Lenguajes a usar
 
