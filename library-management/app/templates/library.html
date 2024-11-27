@@ -1,19 +1,24 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Libros en tu Biblioteca</h1>
+<h2>Libros</h2>
 <div class="row">
     {% for book in books %}
     <div class="col-md-4">
-        <div class="card mb-4">
-            <img src="{{ book.image_url if book.image_url else '/static/no_image.png' }}" class="card-img-top" alt="Portada">
-            <div class="card-body">
-                <h5 class="card-title">{{ book.title }}</h5>
-                <p class="card-text">Autor: {{ book.author }}</p>
-                <p class="card-text">Descripción: {{ book.description }}</p>
-            </div>
-        </div>
+        <h5>{{ book.title }}</h5>
+        <p>{{ book.author }}</p>
     </div>
     {% endfor %}
 </div>
+
+<h2>Mangas</h2>
+<div class="row">
+    {% for manga in mangas %}
+    <div class="col-md-4">
+        <h5>{{ manga.title }}</h5>
+        <p>{{ manga.description[:150] }}</p>
+    </div>
+    {% endfor %}
+</div>
+
 {% endblock %}

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Resultados de la Búsqueda</h1>
+<div class="row">
+    {% for manga in mangas %}
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <img 
+                src="https://uploads.mangadex.org/covers/{{ manga.id }}/{{ manga.relationships[0].attributes.fileName if manga.relationships and manga.relationships[0].attributes else '/static/no_image.png' }}" 
+                class="card-img-top" 
+                alt="Portada">
+            <div class="card-body">
+                <h5 class="card-title">{{ manga.attributes.title.en if manga.attributes and manga.attributes.title.en else 'Título desconocido' }}</h5>
+                <p class="card-text">{{ manga.attributes.description.en[:150] if manga.attributes and manga.attributes.description and 'en' in manga.attributes.description else 'Sin descripción disponible' }}...</p>
+                <form method="POST" action="/add_manga">
+                    <input type="hidden" name="id" value="{{ manga.id }}">
+                    <input type="hidden" name="title" value="{{ manga.attributes.title.en if manga.attributes and manga.attributes.title.en else 'Título desconocido' }}">
+                    <input type="hidden" name="description" value="{{ manga.attributes.description.en if manga.attributes and manga.attributes.description and 'en' in manga.attributes.description else '' }}">
+                    <input type="hidden" name="year" value="{{ manga.attributes.year if manga.attributes and manga.attributes.year else '' }}">
+                    <input type="hidden" name="content_rating" value="{{ manga.attributes.contentRating if manga.attributes and manga.attributes.contentRating else 'safe' }}">
+                    <button type="submit" class="btn btn-success">Guardar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
