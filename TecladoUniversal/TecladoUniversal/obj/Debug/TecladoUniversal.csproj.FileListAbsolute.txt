@@ -1,0 +1,10 @@
+C:\Users\ncb-dpmo\source\repos\TecladoUniversal\TecladoUniversal\bin\Debug\TecladoUniversal.exe.config
+C:\Users\ncb-dpmo\source\repos\TecladoUniversal\TecladoUniversal\bin\Debug\TecladoUniversal.exe
+C:\Users\ncb-dpmo\source\repos\TecladoUniversal\TecladoUniversal\bin\Debug\TecladoUniversal.pdb
+C:\Users\ncb-dpmo\source\repos\TecladoUniversal\TecladoUniversal\obj\Debug\TecladoUniversal.csproj.AssemblyReference.cache
+C:\Users\ncb-dpmo\source\repos\TecladoUniversal\TecladoUniversal\obj\Debug\TecladoUniversal.Form1.resources
+C:\Users\ncb-dpmo\source\repos\TecladoUniversal\TecladoUniversal\obj\Debug\TecladoUniversal.Properties.Resources.resources
+C:\Users\ncb-dpmo\source\repos\TecladoUniversal\TecladoUniversal\obj\Debug\TecladoUniversal.csproj.GenerateResource.cache
+C:\Users\ncb-dpmo\source\repos\TecladoUniversal\TecladoUniversal\obj\Debug\TecladoUniversal.csproj.CoreCompileInputs.cache
+C:\Users\ncb-dpmo\source\repos\TecladoUniversal\TecladoUniversal\obj\Debug\TecladoUniversal.exe
+C:\Users\ncb-dpmo\source\repos\TecladoUniversal\TecladoUniversal\obj\Debug\TecladoUniversal.pdb

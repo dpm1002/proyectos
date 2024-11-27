@@ -1,0 +1,87 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "E:\\Repository\\david\\repoGit\\proyectos\\TecladoUniversal\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{E1F9A609-AB72-475B-9E7F-41C4A8C3BF8C}|TecladoUniversal\\TecladoUniversal.csproj|e:\\repository\\david\\repogit\\proyectos\\tecladouniversal\\tecladouniversal\\form1.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E1F9A609-AB72-475B-9E7F-41C4A8C3BF8C}|TecladoUniversal\\TecladoUniversal.csproj|solutionrelative:tecladouniversal\\form1.designer.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E1F9A609-AB72-475B-9E7F-41C4A8C3BF8C}|TecladoUniversal\\TecladoUniversal.csproj|E:\\Repository\\david\\repoGit\\proyectos\\TecladoUniversal\\tecladouniversal\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form",
+      "RelativeMoniker": "D:0:0:{E1F9A609-AB72-475B-9E7F-41C4A8C3BF8C}|TecladoUniversal\\TecladoUniversal.csproj|solutionrelative:tecladouniversal\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}|Form"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E1F9A609-AB72-475B-9E7F-41C4A8C3BF8C}|TecladoUniversal\\TecladoUniversal.csproj|E:\\Repository\\david\\repoGit\\proyectos\\TecladoUniversal\\tecladouniversal\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E1F9A609-AB72-475B-9E7F-41C4A8C3BF8C}|TecladoUniversal\\TecladoUniversal.csproj|solutionrelative:tecladouniversal\\form1.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{E1F9A609-AB72-475B-9E7F-41C4A8C3BF8C}|TecladoUniversal\\TecladoUniversal.csproj|E:\\Repository\\david\\repoGit\\proyectos\\TecladoUniversal\\tecladouniversal\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{E1F9A609-AB72-475B-9E7F-41C4A8C3BF8C}|TecladoUniversal\\TecladoUniversal.csproj|solutionrelative:tecladouniversal\\program.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "Form1.Designer.cs",
+              "DocumentMoniker": "E:\\Repository\\david\\repoGit\\proyectos\\TecladoUniversal\\TecladoUniversal\\Form1.Designer.cs",
+              "RelativeDocumentMoniker": "TecladoUniversal\\Form1.Designer.cs",
+              "ToolTip": "E:\\Repository\\david\\repoGit\\proyectos\\TecladoUniversal\\TecladoUniversal\\Form1.Designer.cs",
+              "RelativeToolTip": "TecladoUniversal\\Form1.Designer.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAABAAAAAJAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-27T08:10:03.715Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "Form1.cs",
+              "DocumentMoniker": "E:\\Repository\\david\\repoGit\\proyectos\\TecladoUniversal\\TecladoUniversal\\Form1.cs",
+              "RelativeDocumentMoniker": "TecladoUniversal\\Form1.cs",
+              "ToolTip": "E:\\Repository\\david\\repoGit\\proyectos\\TecladoUniversal\\TecladoUniversal\\Form1.cs",
+              "RelativeToolTip": "TecladoUniversal\\Form1.cs",
+              "ViewState": "AQIAAHEAAAAAAAAAAAAnwH0AAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-27T08:09:56.304Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "Program.cs",
+              "DocumentMoniker": "E:\\Repository\\david\\repoGit\\proyectos\\TecladoUniversal\\TecladoUniversal\\Program.cs",
+              "RelativeDocumentMoniker": "TecladoUniversal\\Program.cs",
+              "ToolTip": "E:\\Repository\\david\\repoGit\\proyectos\\TecladoUniversal\\TecladoUniversal\\Program.cs",
+              "RelativeToolTip": "TecladoUniversal\\Program.cs",
+              "ViewState": "AQIAAAEAAAAAAAAAAAAwwBIAAAAiAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-27T08:09:44.594Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Form1.cs [Dise\u00F1o]",
+              "DocumentMoniker": "E:\\Repository\\david\\repoGit\\proyectos\\TecladoUniversal\\TecladoUniversal\\Form1.cs",
+              "RelativeDocumentMoniker": "TecladoUniversal\\Form1.cs",
+              "ToolTip": "C:\\Users\\ncb-dpmo\\source\\repos\\TecladoUniversal\\TecladoUniversal\\Form1.cs [Dise\u00F1o]",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2024-11-26T16:18:31.48Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
