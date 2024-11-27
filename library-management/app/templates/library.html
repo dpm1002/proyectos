@@ -1,7 +1,19 @@
-{% for book in books %}
-    <div>
-        <h3>{{ book.title }}</h3>
-        <p>Autor: {{ book.author }}</p>
-        <p>Serie: {{ book.series }}</p>
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Libros en tu Biblioteca</h1>
+<div class="row">
+    {% for book in books %}
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <img src="{{ book.image_url if book.image_url else '/static/no_image.png' }}" class="card-img-top" alt="Portada">
+            <div class="card-body">
+                <h5 class="card-title">{{ book.title }}</h5>
+                <p class="card-text">Autor: {{ book.author }}</p>
+                <p class="card-text">Descripción: {{ book.description }}</p>
+            </div>
+        </div>
     </div>
-{% endfor %}
+    {% endfor %}
+</div>
+{% endblock %}
