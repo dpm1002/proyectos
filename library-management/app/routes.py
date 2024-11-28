@@ -23,23 +23,40 @@ def searchManga():
         results = search_manga(query)
         return render_template("manga_results.html", mangas=results)
     return render_template("manga_search.html")
+
     
 
 def search_manga(query):
-    url = f"https://api.mangadex.org/manga"
-    params = {
-        "title": query,
-        "limit": 10,  # Número máximo de resultados
-        "includes[]": "cover_art",  # Incluir imágenes de portada
-    }
-    
+    url = f"https://api.jikan.moe/v4/manga"
+    params = {"q": query, "limit": 10}
+
     response = requests.get(url, params=params)
-    
+
     if response.status_code == 200:
-        return response.json().get("data", [])
+        data = response.json().get("data", [])
+        return [
+            {
+                "id": manga.get("mal_id"),
+                "title": manga.get("title", "Título desconocido"),
+                "description": manga.get("synopsis", "Sin descripción disponible"),
+                "image_url": (
+                    manga.get("images", {}).get("jpg", {}).get("image_url")
+                    if manga.get("images") and manga.get("images").get("jpg")
+                    else "/static/no_image.png"
+                ),
+                "year": (
+                    manga.get("published", {}).get("from", "").split("-")[0]
+                    if manga.get("published") and manga.get("published").get("from")
+                    else "Desconocido"
+                ),
+                "content_rating": manga.get("rating", "Desconocido"),
+            }
+            for manga in data
+        ]
     else:
-        print(f"Error al conectar con la API de MangaDex: {response.status_code}")
+        print(f"Error al conectar con Jikan API: {response.status_code}")
         return []
+
     
 @bp.route("/add_manga", methods=["POST"])
 def add_manga():
