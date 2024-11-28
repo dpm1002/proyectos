@@ -10,12 +10,12 @@ class Book(db.Model):
     image_url = db.Column(db.String(300))
 
 class Manga(db.Model):
-    id = db.Column(db.String(50), primary_key=True)  # ID de MangaDex (UUID)
+    id = db.Column(db.Integer, primary_key=True)  # ID de Jikan (Integer)
     title = db.Column(db.String(200), nullable=False)
     description = db.Column(db.Text, nullable=True)
-    original_language = db.Column(db.String(10), nullable=True)
-    year = db.Column(db.Integer, nullable=True)
-    content_rating = db.Column(db.String(50), nullable=True)  # Ejemplo: "safe", "suggestive", etc.
+    original_language = db.Column(db.String(10), nullable=True, default="ja")  # Idioma predeterminado
+    year = db.Column(db.String(4), nullable=True)  # Año como texto (Jikan API devuelve año como string)
+    content_rating = db.Column(db.String(50), nullable=True)  # Ejemplo: "PG-13"
     image_url = db.Column(db.String(300), nullable=True)
 
     def __repr__(self):
