@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1 class="text-center">{{ manga.title }}</h1>
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <img 
+                src="{{ manga.image_url if manga.image_url else '/static/no_image.png' }}" 
+                class="img-fluid" 
+                alt="{{ manga.title }}">
+        </div>
+        <div class="col-md-8">
+            <h3>Detalles</h3>
+            <p><strong>Año:</strong> {{ manga.year if manga.year else 'Desconocido' }}</p>
+            <p><strong>Clasificación:</strong> {{ manga.content_rating }}</p>
+            <p><strong>Descripción:</strong> {{ manga.description if manga.description else 'Sin descripción disponible' }}</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
