@@ -105,6 +105,19 @@ def add_book():
     db.session.commit()
     return redirect(url_for("routes.library"))
 
+@bp.route("/book/<int:book_id>")
+def book_details(book_id):
+    # Obtener el libro de la base de datos
+    book = Book.query.get_or_404(book_id)
+    return render_template("book_details.html", book=book)
+
+@bp.route("/manga/<int:manga_id>")
+def manga_details(manga_id):
+    # Obtener el manga de la base de datos
+    manga = Manga.query.get_or_404(manga_id)
+    return render_template("manga_details.html", manga=manga)
+
+
 @bp.route("/library")
 def library():
     books = Book.query.all()
