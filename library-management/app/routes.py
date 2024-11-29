@@ -32,10 +32,44 @@ def search_game():
 
 @bp.route("/searchBOOK", methods=["POST"])
 def searchBook():
-    query = request.form.get("query")
-    response = requests.get(f"https://www.googleapis.com/books/v1/volumes?q={query}")
-    books = response.json().get("items", [])
-    return render_template("results.html", books=books)
+    query = request.form.get("query")  # Texto de búsqueda
+    filter_categories = request.form.getlist("filter_category")  # Géneros seleccionados (lista)
+
+    if not query and not filter_categories:
+        return "Debe proporcionar un término de búsqueda o seleccionar al menos un género.", 400
+
+    # Base de la URL
+    url = "https://www.googleapis.com/books/v1/volumes?q="
+
+    # Construcción de la consulta de texto
+    if query:
+        url += query
+
+    # Construcción de la consulta de géneros (OR lógico)
+    if filter_categories:
+        if query:
+            url += "+"
+        url += "+subject:" + "+OR+subject:".join(filter_categories)
+
+    try:
+        response = requests.get(url)
+        response.raise_for_status()
+        books = response.json().get("items", [])
+        return render_template("results.html", books=books)
+    except requests.exceptions.RequestException as e:
+        print(f"Error al conectar con la API de Google Books: {e}")
+        return f"Error al conectar con la API de Google Books: {e}", 500
+
+
+
+
+@bp.route("/book/<int:book_id>/update_genres", methods=["POST"])
+def update_book_genres(book_id):
+    book = Book.query.get_or_404(book_id)
+    book.genres = request.form.get("genres")
+    db.session.commit()
+    return redirect(url_for("routes.book_details", book_id=book_id))
+
 
 @bp.route("/searchMANGA", methods=["POST"])
 def searchManga():
@@ -208,6 +242,20 @@ def library():
     mangas = Manga.query.all()
     games = Game.query.all()
     return render_template("library.html", books=books, mangas=mangas, games=games)
+
+@bp.route("/get_categories", methods=["GET"])
+def get_categories():
+    url = "https://www.googleapis.com/books/v1/volumes?q=science"
+    response = requests.get(url)
+    categories = set()
+
+    if response.status_code == 200:
+        books = response.json().get("items", [])
+        for book in books:
+            categories.update(book.get("volumeInfo", {}).get("categories", []))
+    
+    return {"categories": list(categories)}
+
 
 @bp.route("/libros")
 def libros():

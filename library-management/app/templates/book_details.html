@@ -55,6 +55,17 @@
                 </div>
                 <button type="submit" class="btn btn-primary">Guardar Cambios</button>
             </form>
+            <h4>Actualizar Géneros</h4>
+            <form method="POST" action="{{ url_for('routes.update_book_genres', book_id=book.id) }}">
+                <input 
+                    type="text" 
+                    class="form-control" 
+                    name="genres" 
+                    value="{{ book.genres }}" 
+                    placeholder="Ejemplo: Ficción, Fantasía, Aventura">
+                <button type="submit" class="btn btn-primary mt-3">Guardar</button>
+            </form>
+
         </div>
     </div>
 </div>
