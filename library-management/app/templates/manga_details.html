@@ -2,7 +2,7 @@
 
 {% block content %}
 <div class="container mt-4">
-    <h1 class="text-center">{{ manga.title }}</h1>
+    <h1>{{ manga.title }}</h1>
     <div class="row mt-4">
         <div class="col-md-4">
             <img 
@@ -11,10 +11,49 @@
                 alt="{{ manga.title }}">
         </div>
         <div class="col-md-8">
-            <h3>Detalles</h3>
+            <h3>Detalles del Manga</h3>
             <p><strong>Año:</strong> {{ manga.year if manga.year else 'Desconocido' }}</p>
-            <p><strong>Clasificación:</strong> {{ manga.content_rating }}</p>
-            <p><strong>Descripción:</strong> {{ manga.description if manga.description else 'Sin descripción disponible' }}</p>
+            <p><strong>Clasificación:</strong> {{ manga.content_rating if manga.content_rating else 'No disponible' }}</p>
+            <p><strong>Descripción:</strong> {{ manga.description if manga.description else 'No disponible' }}</p>
+
+            <h4>Tu Valoración</h4>
+            <p><strong>Estado:</strong> {{ manga.status if manga.status else 'No especificado' }}</p>
+            <p><strong>Tu valoración:</strong> {{ manga.user_rating if manga.user_rating else 'Sin valoración' }}</p>
+            <p><strong>Descripción Personal:</strong> {{ manga.user_description if manga.user_description else 'No proporcionada' }}</p>
+
+            <!-- Botón para actualizar los datos -->
+            <h4>Actualizar Información Personal</h4>
+            <form method="POST" action="{{ url_for('routes.update_manga', manga_id=manga.id) }}">
+                <div class="mb-3">
+                    <label for="user_rating" class="form-label">Valoración (0-10):</label>
+                    <input 
+                        type="number" 
+                        class="form-control" 
+                        id="user_rating" 
+                        name="user_rating" 
+                        min="0" 
+                        max="10" 
+                        step="0.1" 
+                        value="{{ manga.user_rating }}">
+                </div>
+                <div class="mb-3">
+                    <label for="user_description" class="form-label">Descripción Personal:</label>
+                    <textarea 
+                        class="form-control" 
+                        id="user_description" 
+                        name="user_description">{{ manga.user_description }}</textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="status" class="form-label">Estado:</label>
+                    <select class="form-control" id="status" name="status">
+                        <option value="No vista" {% if manga.status == "No vista" %}selected{% endif %}>No vista</option>
+                        <option value="Leyendo" {% if manga.status == "Leyendo" %}selected{% endif %}>Leyendo</option>
+                        <option value="Terminada" {% if manga.status == "Terminada" %}selected{% endif %}>Terminada</option>
+                        <option value="Planeada" {% if manga.status == "Planeada" %}selected{% endif %}>Planeada</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+            </form>
         </div>
     </div>
 </div>

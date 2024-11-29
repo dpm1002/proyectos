@@ -88,6 +88,16 @@ def add_manga():
 
     return redirect(url_for("routes.library"))
 
+@bp.route("/manga/<int:manga_id>/update", methods=["POST"])
+def update_manga(manga_id):
+    manga = Manga.query.get_or_404(manga_id)
+    manga.user_rating = request.form.get("user_rating", type=float)
+    manga.user_description = request.form.get("user_description")
+    manga.status = request.form.get("status")
+    db.session.commit()
+    return redirect(url_for("routes.manga_details", manga_id=manga_id))
+
+
 
 
 @bp.route("/add_book", methods=["POST"])
@@ -104,6 +114,17 @@ def add_book():
     db.session.add(book)
     db.session.commit()
     return redirect(url_for("routes.library"))
+
+@bp.route("/book/<int:book_id>/update", methods=["POST"])
+def update_book(book_id):
+    book = Book.query.get_or_404(book_id)
+    book.user_rating = request.form.get("user_rating", type=float)
+    book.user_description = request.form.get("user_description")
+    book.status = request.form.get("status")
+    db.session.commit()
+    return redirect(url_for("routes.book_details", book_id=book_id))
+
+
 
 @bp.route("/book/<int:book_id>")
 def book_details(book_id):
