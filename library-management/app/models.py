@@ -8,10 +8,11 @@ class Book(db.Model):
     published_date = db.Column(db.String(20))
     description = db.Column(db.Text)
     image_url = db.Column(db.String(300))
-    # Para el usuario
-    user_rating = db.Column(db.Float, nullable=True)  # Valoración del usuario
-    user_description = db.Column(db.Text, nullable=True)  # Descripción personalizada
-    status = db.Column(db.String(20), nullable=True)  # Estado
+    user_rating = db.Column(db.Float, nullable=True)
+    user_description = db.Column(db.Text, nullable=True)
+    status = db.Column(db.String(20), nullable=True)
+    genres = db.Column(db.String(200), nullable=True)  # Campo para géneros personalizados
+
 
 class Manga(db.Model):
     id = db.Column(db.Integer, primary_key=True)

@@ -3,11 +3,18 @@
 {% block content %}
 <div class="text-center">
     <h1>Busca un Libro</h1>
-    <form method="POST" action="/searchBOOK" class="mt-4">
-        <div class="mb-3">
-            <input type="text" class="form-control" name="query" placeholder="Título o autor..." required>
-        </div>
+    <form method="POST" action="/searchBOOK">
+        <input type="text" class="form-control mb-2" name="query" placeholder="Título o autor...">
+        <select name="filter_category" class="form-select mb-3">
+            <option value="Fiction">Ficción</option>
+            <option value="Fantasy">Fantasía</option>
+            <option value="Science">Ciencia</option>
+            <option value="Biography">Biografía</option>
+            <option value="History">Historia</option>
+            <!-- Agrega más categorías según sea necesario -->
+        </select>
         <button type="submit" class="btn btn-primary">Buscar</button>
     </form>
+    
 </div>
 {% endblock %}
