@@ -1,11 +1,54 @@
 {% extends "base.html" %}
 
 {% block content %}
-<div class="text-center">
-    <h1>Bienvenido a la Gestión de Biblioteca</h1>
-    <p>Administra y busca libros de manera eficiente.</p>
-    <a href="{{ url_for('routes.libros') }}" class="btn btn-primary">Ir a Buscar Libros</a>
-    <a href="{{ url_for('routes.manga') }}" class="btn btn-primary">Ir a Buscar Mangas</a>
-    <a href="{{ url_for('routes.library') }}" class="btn btn-primary">Ir a Libreria</a>
+<div class="container mt-5">
+    <div class="jumbotron text-center bg-light p-5 rounded">
+        <h1 class="display-4">Gestión de Biblioteca</h1>
+        <p class="lead">Administra y busca lo que mas quieras de manera fácil y eficiente.</p>
+        <hr class="my-4">
+        <p>Explora nuestro catálogo, guarda tus favoritos y mantén todo organizado.</p>
+        <div class="d-flex justify-content-center mt-4">
+            <a href="{{ url_for('routes.libros') }}" class="btn btn-primary btn-lg mx-2">
+                <i class="fas fa-book"></i> Buscar Libros
+            </a>
+            <a href="{{ url_for('routes.manga') }}" class="btn btn-success btn-lg mx-2">
+                <i class="fas fa-dragon"></i> Buscar Mangas
+            </a>
+
+            <a href="{{ url_for('routes.games') }}" class="btn btn-success btn-lg mx-2">
+                <i class="fas fa-dragon"></i> Buscar VideoJuegos
+            </a>
+
+            <a href="{{ url_for('routes.library') }}" class="btn btn-secondary btn-lg mx-2">
+                <i class="fas fa-archive"></i> Ver Librería
+            </a>
+        </div>
+    </div>
+
+    <!-- Sección adicional -->
+    <div class="row mt-5">
+        <div class="col-md-4 text-center">
+            <i class="fas fa-search fa-3x mb-3"></i>
+            <h3>Busca</h3>
+            <p>Encuentra todo lo que quieras con facilidad gracias a nuestras herramientas de búsqueda avanzadas.</p>
+        </div>
+        <div class="col-md-4 text-center">
+            <i class="fas fa-heart fa-3x mb-3"></i>
+            <h3>Administra</h3>
+            <p>Guarda todo lo que quieras en favoritos en tu librería personal para acceso rápido.</p>
+        </div>
+        <div class="col-md-4 text-center">
+            <i class="fas fa-chart-line fa-3x mb-3"></i>
+            <h3>Organiza</h3>
+            <p>Mantén todo organizado con estados personalizados y valoraciones personales.</p>
+        </div>
+    </div>
+    <footer class="bg-dark text-white text-center py-3 mt-5">
+        <p>&copy; 2024 BibliotecaApp. Todos los derechos reservados.</p>
+        <p>
+            <a href="https://github.com/dpm1002" class="text-white">GitHub</a> |
+            <a href="https://linkedin.com/in/davidperezmoreno14" class="text-white">LinkedIn</a>
+        </p>
+    </footer>
 </div>
 {% endblock %}
