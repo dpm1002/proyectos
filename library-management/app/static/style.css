@@ -1,3 +1,87 @@
-.card {
-    min-height: 350px;
+/* Fondo general */
+body {
+    background-color: #f8f9fa; /* Gris claro */
+    color: #333; /* Texto legible */
+}
+
+/* Jumbotron */
+.jumbotron {
+    background: #ffffff; /* Fondo blanco */
+    border-radius: 10px;
+    padding: 3rem 2rem;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Sombra ligera */
+    animation: fadeIn 1.5s ease; /* Animación de entrada */
+}
+
+/* Botones */
+.btn-primary {
+    background-color: #007bff;
+    border: none;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+    transform: scale(1.1);
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.btn-success {
+    background-color: #28a745;
+    border: none;
+}
+
+.btn-success:hover {
+    background-color: #218838;
+    transform: scale(1.1);
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    border: none;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+    transform: scale(1.1);
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Íconos */
+.row i {
+    color: #007bff;
+    transition: color 0.3s ease;
+}
+
+.row i:hover {
+    color: #0056b3;
+}
+
+/* Pie de página */
+footer {
+    background-color: #343a40;
+    color: #ffffff;
+    text-align: center;
+    padding: 15px 0;
+}
+
+footer a {
+    color: #ffffff;
+    text-decoration: none;
+}
+
+footer a:hover {
+    text-decoration: underline;
+}
+
+/* Animaciones personalizadas */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
