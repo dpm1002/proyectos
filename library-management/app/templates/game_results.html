@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Resultados de Videojuegos</h1>
+<div class="row">
+    {% for game in games %}
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <img 
+                src="{{ game.background_image if game.background_image else '/static/no_image.png' }}" 
+                class="card-img-top" 
+                alt="{{ game.name }}">
+            <div class="card-body">
+                <h5 class="card-title">{{ game.name }}</h5>
+                <p class="card-text">Fecha de lanzamiento: {{ game.released }}</p>
+                <p class="card-text">Calificación: {{ game.rating }}</p>
+                <form method="POST" action="/add_game">
+                    <input type="hidden" name="id" value="{{ game.id }}">
+                    <input type="hidden" name="title" value="{{ game.name }}">
+                    <input type="hidden" name="released" value="{{ game.released }}">
+                    <input type="hidden" name="rating" value="{{ game.rating }}">
+                    <input type="hidden" name="image_url" value="{{ game.background_image }}">
+                    <button type="submit" class="btn btn-success">Guardar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

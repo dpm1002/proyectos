@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>{{ game.title }}</h1>
+    <div class="row mt-4">
+        <div class="col-md-4">
+            <img 
+                src="{{ game.image_url if game.image_url else '/static/no_image.png' }}" 
+                class="img-fluid" 
+                alt="{{ game.title }}">
+        </div>
+        <div class="col-md-8">
+            <h3>Detalles del Juego</h3>
+            <p><strong>Fecha de Lanzamiento:</strong> {{ game.released if game.released else 'Desconocida' }}</p>
+            <p><strong>Calificación:</strong> {{ game.rating }}</p>
+            <h4>Tu Información Personal</h4>
+            <p><strong>Estado:</strong> {{ game.status if game.status else 'No especificado' }}</p>
+            <p><strong>Tu valoración:</strong> {{ game.user_rating if game.user_rating else 'Sin valoración' }}</p>
+            <p><strong>Descripción Personal:</strong> {{ game.user_description if game.user_description else 'No proporcionada' }}</p>
+
+            <!-- Botón para actualizar los datos -->
+            <h4>Actualizar Información Personal</h4>
+            <form method="POST" action="{{ url_for('routes.update_game', game_id=game.id) }}">
+                <div class="mb-3">
+                    <label for="user_rating" class="form-label">Valoración (1-5):</label>
+                    <input 
+                        type="number" 
+                        class="form-control" 
+                        id="user_rating" 
+                        name="user_rating" 
+                        min="1" 
+                        max="5" 
+                        step="0.5" 
+                        value="{{ game.user_rating }}">
+                </div>
+                <div class="mb-3">
+                    <label for="user_description" class="form-label">Descripción Personal:</label>
+                    <textarea 
+                        class="form-control" 
+                        id="user_description" 
+                        name="user_description">{{ game.user_description }}</textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="status" class="form-label">Estado:</label>
+                    <select class="form-control" id="status" name="status">
+                        <option value="No jugado" {% if game.status == "No jugado" %}selected{% endif %}>No jugado</option>
+                        <option value="Jugando" {% if game.status == "Jugando" %}selected{% endif %}>Jugando</option>
+                        <option value="Terminado" {% if game.status == "Terminado" %}selected{% endif %}>Terminado</option>
+                        <option value="Planeado" {% if game.status == "Planeado" %}selected{% endif %}>Planeado</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
