@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spotify Player</title>
+    <script src="https://sdk.scdn.co/spotify-player.js"></script>
+</head>
+<body>
+    <h1>Spotify Web Playback SDK</h1>
+
+    {% if profile %}
+        <p>Usuario: {{ profile.display_name }}</p>
+        <p>Perfil de Spotify: 
+            {% if profile.external_urls and profile.external_urls.spotify %}
+                <a href="{{ profile.external_urls.spotify }}" target="_blank">Ver perfil</a>
+            {% else %}
+                No disponible
+            {% endif %}
+        </p>
+    {% else %}
+        <p>No se pudo cargar la información del perfil.</p>
+    {% endif %}
+
+    {% if playlists %}
+        <h2>Tus Listas de Reproducción</h2>
+        <ul>
+            {% for playlist in playlists %}
+                {% if playlist and playlist.name and playlist.tracks %}
+                    <li>
+                        <strong>{{ playlist.name }}</strong>
+                        {% if playlist.external_urls and playlist.external_urls.spotify %}
+                            <a href="{{ playlist.external_urls.spotify }}" target="_blank">Ver en Spotify</a>
+                        {% else %}
+                            (Sin enlace disponible)
+                        {% endif %}
+                        ({{ playlist.tracks.total }} canciones)
+                    </li>
+                {% else %}
+                    <li>(Datos de la playlist no disponibles)</li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No se encontraron listas de reproducción.</p>
+    {% endif %}
+
+    <!-- Controles del reproductor -->
+    <button id="play">Reproducir</button>
+    <button id="pause">Pausar</button>
+
+    <script>
+        window.onSpotifyWebPlaybackSDKReady = () => {
+            const token = "{{ access_token }}";  // Token pasado desde el backend
+            const player = new Spotify.Player({
+                name: 'Mi Reproductor Web',
+                getOAuthToken: cb => { cb(token); },
+                volume: 0.5
+            });
+
+            // Listeners
+            player.addListener('ready', ({ device_id }) => {
+                console.log('Reproductor listo con ID:', device_id);
+            });
+
+            player.addListener('not_ready', ({ device_id }) => {
+                console.log('Reproductor no está listo con ID:', device_id);
+            });
+
+            // Conectar el reproductor
+            player.connect();
+
+            // Controles
+            document.getElementById('play').addEventListener('click', () => {
+                player.resume();
+            });
+            document.getElementById('pause').addEventListener('click', () => {
+                player.pause();
+            });
+        };
+    </script>
+</body>
+</html>
