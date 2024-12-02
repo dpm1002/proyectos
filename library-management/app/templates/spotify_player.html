@@ -45,6 +45,12 @@
             border-radius: 5px;
             margin-right: 10px;
         }
+        .search-result img {
+            width: 50px;
+            height: 50px;
+            margin-right: 10px;
+            border-radius: 5px;
+        }
     </style>
 </head>
 <body>
@@ -103,6 +109,16 @@
                 </button>
             </div>
         </div>
+
+        <!-- Buscador de canciones -->
+        <div class="search mt-5">
+            <h4>Buscar Canciones</h4>
+            <form id="search-form" class="mb-3">
+                <input type="text" id="search-query" class="form-control" placeholder="Introduce el nombre de la canción o artista">
+                <button type="submit" class="btn btn-primary mt-3">Buscar</button>
+            </form>
+            <div id="search-results" class="list-group"></div>
+        </div>
     </div>
 
     <script>
@@ -123,6 +139,42 @@
             });
 
             player.connect();
+
+            // Actualizar dispositivos
+            async function updateDevices() {
+                const response = await fetch('https://api.spotify.com/v1/me/player/devices', {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const data = await response.json();
+
+                const deviceList = document.getElementById('device-list');
+                deviceList.innerHTML = '';
+
+                data.devices.forEach(device => {
+                    const deviceElement = document.createElement('div');
+                    deviceElement.className = `device-item ${device.id === currentDeviceId ? 'active' : ''}`;
+                    deviceElement.innerHTML = `
+                        <span>${device.name} (${device.type})</span>
+                        <span>${device.is_active ? '[Activo]' : ''}</span>
+                    `;
+                    deviceElement.addEventListener('click', () => setActiveDevice(device.id));
+                    deviceList.appendChild(deviceElement);
+                });
+            }
+
+            async function setActiveDevice(deviceId) {
+                await fetch('https://api.spotify.com/v1/me/player', {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${token}`
+                    },
+                    body: JSON.stringify({ device_ids: [deviceId], play: false })
+                });
+                currentDeviceId = deviceId;
+                updateDevices();
+                updateCurrentTrack();
+            }
 
             // Actualizar canción actual
             async function updateCurrentTrack() {
@@ -173,39 +225,52 @@
                 }).then(updateCurrentTrack);
             });
 
-            // Actualizar dispositivos
-            document.getElementById('get-devices').addEventListener('click', async () => {
-                const response = await fetch('https://api.spotify.com/v1/me/player/devices', {
+            // Buscador de canciones
+            document.getElementById('search-form').addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const query = document.getElementById('search-query').value;
+                const response = await fetch(`https://api.spotify.com/v1/search?q=${query}&type=track&limit=10`, {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const data = await response.json();
-                const deviceList = document.getElementById('device-list');
-                deviceList.innerHTML = '';
+                const results = document.getElementById('search-results');
+                results.innerHTML = '';
 
-                data.devices.forEach(device => {
-                    const li = document.createElement('div');
-                    li.className = `device-item ${device.id === currentDeviceId ? 'active' : ''}`;
-                    li.innerText = `${device.name} (${device.type}) ${device.is_active ? '[Activo]' : ''}`;
-                    li.setAttribute('data-id', device.id);
+                if (data.tracks.items.length > 0) {
+                    data.tracks.items.forEach(track => {
+                        const resultItem = document.createElement('div');
+                        resultItem.className = 'list-group-item search-result';
+                        resultItem.innerHTML = `
+                            <img src="${track.album.images[0].url}" alt="Carátula">
+                            <span>${track.name} - ${track.artists.map(artist => artist.name).join(', ')}</span>
+                            <button class="btn btn-primary btn-sm float-end play-track" data-uri="${track.uri}">
+                                Reproducir
+                            </button>
+                        `;
+                        results.appendChild(resultItem);
+                    });
 
-                    li.addEventListener('click', () => setActiveDevice(device.id));
-                    deviceList.appendChild(li);
-                });
+                    document.querySelectorAll('.play-track').forEach(button => {
+                        button.addEventListener('click', (e) => {
+                            const trackUri = e.target.getAttribute('data-uri');
+                            fetch(`https://api.spotify.com/v1/me/player/play?device_id=${currentDeviceId}`, {
+                                method: 'PUT',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    'Authorization': `Bearer ${token}`
+                                },
+                                body: JSON.stringify({ uris: [trackUri] })
+                            }).then(updateCurrentTrack);
+                        });
+                    });
+                } else {
+                    results.innerHTML = '<p>No se encontraron resultados.</p>';
+                }
             });
 
-            async function setActiveDevice(deviceId) {
-                await fetch('https://api.spotify.com/v1/me/player', {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`
-                    },
-                    body: JSON.stringify({ device_ids: [deviceId] })
-                });
-                currentDeviceId = deviceId;
-                document.getElementById('status').innerText = `Dispositivo activo: ${deviceId}`;
-                updateCurrentTrack();
-            }
+            // Inicializar
+            updateDevices();
+            updateCurrentTrack();
 
             // Actualizar canción cada 5 segundos
             setInterval(updateCurrentTrack, 5000);
