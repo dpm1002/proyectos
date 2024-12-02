@@ -2,12 +2,81 @@ from flask import Blueprint, render_template, request, redirect, url_for
 import requests
 from app import db
 from app.models import Book, Manga, Game
+from dotenv import load_dotenv
+from flask import session
+import os
+
+load_dotenv()
 
 bp = Blueprint('routes', __name__)
+
+SPOTIFY_CLIENT_ID = os.getenv("SPOTIFY_CLIENT_ID")
+SPOTIFY_CLIENT_SECRET = os.getenv("SPOTIFY_CLIENT_SECRET")
+SPOTIFY_REDIRECT_URI = os.getenv("SPOTIFY_REDIRECT_URI")
+SPOTIFY_AUTH_URL = "https://accounts.spotify.com/authorize"
+SPOTIFY_TOKEN_URL = "https://accounts.spotify.com/api/token"
+SPOTIFY_API_URL = "https://api.spotify.com/v1"
 
 @bp.route("/")
 def index():
     return render_template("index.html")
+
+@bp.route("/spotify/login")
+def spotify_login():
+    scope = "user-read-playback-state user-modify-playback-state playlist-modify-private playlist-read-private user-read-email"
+    auth_url = (
+        f"{SPOTIFY_AUTH_URL}?response_type=code"
+        f"&client_id={SPOTIFY_CLIENT_ID}&redirect_uri={SPOTIFY_REDIRECT_URI}"
+        f"&scope={scope}"
+    )
+    return redirect(auth_url)
+
+@bp.route("/spotify/callback")
+def spotify_callback():
+    code = request.args.get("code")
+    token_response = requests.post(
+        SPOTIFY_TOKEN_URL,
+        data={
+            "grant_type": "authorization_code",
+            "code": code,
+            "redirect_uri": SPOTIFY_REDIRECT_URI,
+            "client_id": SPOTIFY_CLIENT_ID,
+            "client_secret": SPOTIFY_CLIENT_SECRET,
+        },
+    )
+    tokens = token_response.json()
+    session["access_token"] = tokens.get("access_token")
+    return redirect(url_for("routes.spotify_player"))
+
+
+@bp.route("/spotify/player")
+def spotify_player():
+    access_token = session.get("access_token")
+    if not access_token:
+        return "No access token available. Please log in again.", 401
+
+    headers = {"Authorization": f"Bearer {access_token}"}
+
+    # Obtener información del perfil
+    profile_response = requests.get(f"{SPOTIFY_API_URL}/me", headers=headers)
+    profile_data = profile_response.json() if profile_response.status_code == 200 else None
+    print("Perfil del usuario:", profile_data)  # Verificar la respuesta en los logs
+
+    # Obtener listas de reproducción
+    playlists_response = requests.get(f"{SPOTIFY_API_URL}/me/playlists", headers=headers)
+    playlists_data = playlists_response.json().get("items", []) if playlists_response.status_code == 200 else []
+    print("Listas de reproducción:", playlists_data)  # Verificar la respuesta en los logs
+
+    # Si no hay datos en el perfil o playlists, devuelve un mensaje
+    if not profile_data:
+        return "No se pudo obtener el perfil del usuario. Por favor, inicia sesión nuevamente.", 500
+    if not playlists_data:
+        return "No se encontraron listas de reproducción. Por favor, verifica tu cuenta de Spotify.", 500
+
+    # Pasar los datos al template
+    return render_template("spotify_player.html", profile=profile_data, playlists=playlists_data, access_token=access_token)
+
+
 
 @bp.route("/search_game", methods=["GET", "POST"])
 def search_game():
