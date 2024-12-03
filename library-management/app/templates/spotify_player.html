@@ -44,12 +44,21 @@
             height: 50px;
             border-radius: 5px;
             margin-right: 10px;
+            cursor: pointer;
         }
         .search-result img {
             width: 50px;
             height: 50px;
             margin-right: 10px;
             border-radius: 5px;
+        }
+        .modal-content {
+            color: black; /* Texto en negro */
+        }
+
+        /* Asegurarse de que los títulos y enlaces en el modal también sean negros */
+        .modal-title, #song-details a {
+            color: black;
         }
     </style>
 </head>
@@ -110,6 +119,30 @@
             </div>
         </div>
 
+        <!-- Modal para mostrar detalles de la canción -->
+        <div class="modal fade" id="songInfoModal" tabindex="-1" aria-labelledby="songInfoModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="songInfoModalLabel">Detalles de la canción</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="song-details">
+                            <img src="" alt="Carátula" id="modal-track-image" class="img-fluid mb-3">
+                            <p><strong>Título:</strong> <span id="modal-track-name"></span></p>
+                            <p><strong>Artista:</strong> <span id="modal-track-artist"></span></p>
+                            <p><strong>Álbum:</strong> <span id="modal-track-album"></span></p>
+                            <p><strong>Duración:</strong> <span id="modal-track-duration"></span></p>
+                            <p><strong>Popularidad:</strong> <span id="modal-track-popularity"></span></p> <!-- Nuevo campo -->
+                            <p><strong>Explícito:</strong> <span id="modal-track-explicit"></span></p> <!-- Nuevo campo -->
+                            <a href="#" target="_blank" id="modal-track-link" class="btn btn-success">Abrir en Spotify</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Buscador de canciones -->
         <div class="search mt-5">
             <h4>Buscar Canciones</h4>
@@ -121,6 +154,7 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         window.onSpotifyWebPlaybackSDKReady = () => {
             const token = "{{ access_token }}";
@@ -146,10 +180,8 @@
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const data = await response.json();
-
                 const deviceList = document.getElementById('device-list');
                 deviceList.innerHTML = '';
-
                 data.devices.forEach(device => {
                     const deviceElement = document.createElement('div');
                     deviceElement.className = `device-item ${device.id === currentDeviceId ? 'active' : ''}`;
@@ -176,56 +208,60 @@
                 updateCurrentTrack();
             }
 
+            function showModal(track) {
+                document.getElementById('modal-track-image').src = track.album.images[0].url;
+                document.getElementById('modal-track-name').innerText = track.name;
+                document.getElementById('modal-track-artist').innerText = track.artists.map(artist => artist.name).join(', ');
+                document.getElementById('modal-track-album').innerText = track.album.name;
+                document.getElementById('modal-track-duration').innerText = `${(track.duration_ms / 60000).toFixed(2)} minutos`;
+                document.getElementById('modal-track-popularity').innerText = track.popularity + '%'; // Popularidad
+                document.getElementById('modal-track-explicit').innerText = track.explicit ? 'Sí' : 'No'; // Contenido explícito
+                document.getElementById('modal-track-link').href = track.external_urls.spotify;
+
+                const songInfoModal = new bootstrap.Modal(document.getElementById('songInfoModal'));
+                songInfoModal.show();
+            }
+
+
             // Actualizar canción actual
             async function updateCurrentTrack() {
                 const response = await fetch('https://api.spotify.com/v1/me/player/currently-playing', {
                     headers: { 'Authorization': `Bearer ${token}` }
                 });
                 const data = await response.json();
-
                 if (data && data.item) {
-                    document.getElementById('track-name').innerText = data.item.name;
-                    document.getElementById('track-artist').innerText = data.item.artists.map(artist => artist.name).join(', ');
-                    const image = document.getElementById('track-image');
-                    image.src = data.item.album.images[0].url;
-                    image.classList.remove('d-none');
-                } else {
-                    document.getElementById('track-name').innerText = 'No disponible';
-                    document.getElementById('track-artist').innerText = 'No disponible';
-                    document.getElementById('track-image').classList.add('d-none');
+                    const track = data.item;
+                    const trackImage = document.getElementById('track-image');
+                    document.getElementById('track-name').innerText = track.name;
+                    document.getElementById('track-artist').innerText = track.artists.map(artist => artist.name).join(', ');
+                    trackImage.src = track.album.images[0].url;
+                    trackImage.classList.remove('d-none');
+                    trackImage.dataset.trackId = track.id;
                 }
             }
 
-            // Controles del reproductor
-            document.getElementById('play').addEventListener('click', () => {
-                fetch('https://api.spotify.com/v1/me/player/play', {
-                    method: 'PUT',
-                    headers: { 'Authorization': `Bearer ${token}` }
-                }).then(updateCurrentTrack);
+            document.getElementById('track-image').addEventListener('click', async (e) => {
+                const trackId = e.target.dataset.trackId;
+                if (trackId) {
+                    try {
+                        const response = await fetch(`https://api.spotify.com/v1/tracks/${trackId}`, {
+                            headers: { 'Authorization': `Bearer ${token}` }
+                        });
+                        if (response.ok) {
+                            const trackDetails = await response.json();
+                            showModal(trackDetails); // Llamada a la función para mostrar el modal
+                        } else {
+                            console.error('Error al obtener detalles de la canción:', response.status);
+                        }
+                    } catch (error) {
+                        console.error('Error en la solicitud:', error);
+                    }
+                } else {
+                    console.warn('No se encontró un trackId en el elemento seleccionado.');
+                }
             });
 
-            document.getElementById('pause').addEventListener('click', () => {
-                fetch('https://api.spotify.com/v1/me/player/pause', {
-                    method: 'PUT',
-                    headers: { 'Authorization': `Bearer ${token}` }
-                });
-            });
 
-            document.getElementById('next').addEventListener('click', () => {
-                fetch('https://api.spotify.com/v1/me/player/next', {
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${token}` }
-                }).then(updateCurrentTrack);
-            });
-
-            document.getElementById('previous').addEventListener('click', () => {
-                fetch('https://api.spotify.com/v1/me/player/previous', {
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${token}` }
-                }).then(updateCurrentTrack);
-            });
-
-            // Buscador de canciones
             document.getElementById('search-form').addEventListener('submit', async (e) => {
                 e.preventDefault();
                 const query = document.getElementById('search-query').value;
@@ -235,40 +271,32 @@
                 const data = await response.json();
                 const results = document.getElementById('search-results');
                 results.innerHTML = '';
+                data.tracks.items.forEach(track => {
+                    const resultItem = document.createElement('div');
+                    resultItem.className = 'list-group-item search-result';
+                    resultItem.innerHTML = `
+                        <img src="${track.album.images[0].url}" alt="Carátula">
+                        <span>${track.name} - ${track.artists.map(artist => artist.name).join(', ')}</span>
+                        <button class="btn btn-primary btn-sm float-end play-track" data-uri="${track.uri}">Reproducir</button>
+                    `;
+                    results.appendChild(resultItem);
+                });
 
-                if (data.tracks.items.length > 0) {
-                    data.tracks.items.forEach(track => {
-                        const resultItem = document.createElement('div');
-                        resultItem.className = 'list-group-item search-result';
-                        resultItem.innerHTML = `
-                            <img src="${track.album.images[0].url}" alt="Carátula">
-                            <span>${track.name} - ${track.artists.map(artist => artist.name).join(', ')}</span>
-                            <button class="btn btn-primary btn-sm float-end play-track" data-uri="${track.uri}">
-                                Reproducir
-                            </button>
-                        `;
-                        results.appendChild(resultItem);
+                document.querySelectorAll('.play-track').forEach(button => {
+                    button.addEventListener('click', (e) => {
+                        const trackUri = e.target.getAttribute('data-uri');
+                        fetch(`https://api.spotify.com/v1/me/player/play?device_id=${currentDeviceId}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${token}`
+                            },
+                            body: JSON.stringify({ uris: [trackUri] })
+                        }).then(updateCurrentTrack);
                     });
-
-                    document.querySelectorAll('.play-track').forEach(button => {
-                        button.addEventListener('click', (e) => {
-                            const trackUri = e.target.getAttribute('data-uri');
-                            fetch(`https://api.spotify.com/v1/me/player/play?device_id=${currentDeviceId}`, {
-                                method: 'PUT',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'Authorization': `Bearer ${token}`
-                                },
-                                body: JSON.stringify({ uris: [trackUri] })
-                            }).then(updateCurrentTrack);
-                        });
-                    });
-                } else {
-                    results.innerHTML = '<p>No se encontraron resultados.</p>';
-                }
+                });
             });
 
-            // Inicializar
             updateDevices();
             updateCurrentTrack();
 
