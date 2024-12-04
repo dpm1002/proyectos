@@ -5,6 +5,7 @@ from app.models import Book, Manga, Game
 from dotenv import load_dotenv
 from flask import session
 import os
+from datetime import datetime
 
 load_dotenv()
 
@@ -23,7 +24,7 @@ def index():
 
 @bp.route("/spotify/login")
 def spotify_login():
-    scope = "user-read-playback-state user-modify-playback-state playlist-modify-private playlist-read-private user-read-email"
+    scope = "user-read-playback-state user-modify-playback-state playlist-modify-private playlist-read-private user-read-email user-read-recently-played"
     auth_url = (
         f"{SPOTIFY_AUTH_URL}?response_type=code"
         f"&client_id={SPOTIFY_CLIENT_ID}&redirect_uri={SPOTIFY_REDIRECT_URI}"
@@ -76,6 +77,102 @@ def spotify_player():
     # Pasar los datos al template
     return render_template("spotify_player.html", profile=profile_data, playlists=playlists_data, access_token=access_token)
 
+
+
+@bp.route("/spotify/stats")
+def user_stats():
+    access_token = session.get("access_token")
+    if not access_token:
+        return "No token disponible. Por favor, inicia sesión.", 401
+
+    headers = {"Authorization": f"Bearer {access_token}"}
+
+    # Obtener canciones reproducidas recientemente
+    response_recently_played = requests.get(
+        "https://api.spotify.com/v1/me/player/recently-played?limit=50", headers=headers
+    )
+
+    # Obtener canciones más escuchadas a largo plazo
+    response_top_tracks = requests.get(
+        "https://api.spotify.com/v1/me/top/tracks?time_range=long_term&limit=50", headers=headers
+    )
+
+    tracks_by_month = {}
+
+    # Procesar canciones reproducidas recientemente
+    if response_recently_played.status_code == 200:
+        recently_played = response_recently_played.json().get("items", [])
+        for item in recently_played:
+            played_at = item["played_at"]  # Fecha en formato ISO
+            track = item["track"]
+            month = played_at[:7]  # Extrae "YYYY-MM" para el mes
+            if month not in tracks_by_month:
+                tracks_by_month[month] = {}
+
+            track_id = track["id"]
+            tracks_by_month[month][track_id] = tracks_by_month[month].get(track_id, 0) + 1
+
+    # Procesar canciones más escuchadas
+    if response_top_tracks.status_code == 200:
+        top_tracks = response_top_tracks.json().get("items", [])
+        for track in top_tracks:
+            album = track.get("album", {})
+            release_date = album.get("release_date", "1900-01-01")  # Fecha en formato ISO
+            month = release_date[:7]
+            if month not in tracks_by_month:
+                tracks_by_month[month] = {}
+
+            track_id = track["id"]
+            tracks_by_month[month][track_id] = tracks_by_month[month].get(track_id, 0) + 1
+
+    # Crear una lista ordenada por mes y popularidad
+    sorted_tracks_by_month = {}
+    for month, tracks in tracks_by_month.items():
+        sorted_tracks = sorted(
+            tracks.items(), key=lambda x: x[1], reverse=True
+        )[:5]  # Top 5 canciones por mes
+        sorted_tracks_by_month[month] = sorted_tracks
+
+    # Obtener detalles de las canciones
+    detailed_tracks_by_month = {}
+    for month, tracks in sorted_tracks_by_month.items():
+        detailed_tracks_by_month[month] = []
+        for track_id, count in tracks:
+            track_response = requests.get(
+                f"https://api.spotify.com/v1/tracks/{track_id}", headers=headers
+            )
+            if track_response.status_code == 200:
+                detailed_tracks_by_month[month].append(track_response.json())
+
+    # Renderizar la plantilla
+    return render_template("spotify_stats.html", tracks_by_month=detailed_tracks_by_month)
+
+
+
+
+
+
+def refresh_token():
+    refresh_token = session.get("refresh_token")
+    if not refresh_token:
+        return "No refresh token disponible. Por favor, inicia sesión.", 401
+
+    response = requests.post(
+        "https://accounts.spotify.com/api/token",
+        data={
+            "grant_type": "refresh_token",
+            "refresh_token": refresh_token,
+            "client_id": SPOTIFY_CLIENT_ID,
+            "client_secret": SPOTIFY_CLIENT_SECRET,
+        },
+    )
+
+    if response.status_code == 200:
+        tokens = response.json()
+        session["access_token"] = tokens.get("access_token")
+        return "Token renovado exitosamente."
+    else:
+        return f"Error al renovar token: {response.status_code}, {response.text}", 500
 
 
 @bp.route("/search_game", methods=["GET", "POST"])
