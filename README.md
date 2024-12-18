@@ -7,21 +7,22 @@ En este repositorio me centro en mis proyectos personales, trabajos y codigos co
 
 ## Lenguajes con los que se va a trabajar   
 
-#### Lenguajes Usados
+#### Lenguajes y herramientas con las que estoy trabajando y profundizando
 
 
-| Lenguaje | Proyecto     |
-| :-------- | :------- | 
-| C++ | App-Ingresos-Gastos | 
-| HTML | App-Ingresos-Gastos | 
-| CMake | App-Ingresos-Gastos | 
-| JavaScript | gestor-tareas-api | 
-| Dart | App-Ingresos-Gastos |
-| React | gestor-tareas-api |
-| Flutter | App-Ingresos-Gastos |
-| C# | factorio-simulator | 
+| Lenguaje | 
+| :-------- | 
+| C++ |  
+| HTML | 
+| CMake | 
+| JavaScript | 
+| Dart | 
+| React | 
+| Flutter | 
+| C# | 
+| CSS |
 
-#### Lenguajes a usar
+#### Lenguajes a usar y posibles futuros proyectos
 
 | Lenguaje | Proyecto     |
 | :-------- | :------- | 
