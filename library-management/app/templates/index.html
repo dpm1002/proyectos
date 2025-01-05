@@ -8,21 +8,25 @@
         <hr class="my-4">
         <p>Explora nuestro catálogo, guarda tus favoritos y mantén todo organizado.</p>
         <div class="d-flex justify-content-center mt-4">
-            <a href="{{ url_for('routes.libros') }}" class="btn btn-primary btn-lg mx-2">
-                <i class="fas fa-book"></i> Buscar Libros
+            <!-- Botón de Libros -->
+            <a href="{{ url_for('routes.libros') }}" class="btn btn-primary btn-lg mx-2 d-flex align-items-center justify-content-center">
+                <i class="fas fa-book me-2"></i> Libros
             </a>
-            <a href="{{ url_for('routes.manga') }}" class="btn btn-success btn-lg mx-2">
-                <i class="fas fa-dragon"></i> Buscar Mangas
+            <!-- Botón de Mangas -->
+            <a href="{{ url_for('routes.manga') }}" class="btn btn-success btn-lg mx-2 d-flex align-items-center justify-content-center">
+                <i class="fas fa-dragon me-2"></i> Mangas
             </a>
-
-            <a href="{{ url_for('routes.games') }}" class="btn btn-success btn-lg mx-2">
-                <i class="fas fa-dragon"></i> Buscar VideoJuegos
+            <!-- Botón de Videojuegos -->
+            <a href="{{ url_for('routes.games') }}" class="btn btn-info btn-lg mx-2 d-flex align-items-center justify-content-center">
+                <i class="fas fa-gamepad me-2"></i> Videojuegos
             </a>
-
-            <a href="{{ url_for('routes.library') }}" class="btn btn-secondary btn-lg mx-2">
-                <i class="fas fa-archive"></i> Ver Librería
+            <!-- Botón de Spotify -->
+            <a href="{{ url_for('routes.spotify_login') }}" class="btn btn-warning btn-lg mx-2 d-flex align-items-center justify-content-center">
+                <i class="fas fa-music me-2"></i> Spotify
             </a>
         </div>
+        
+        
     </div>
 
     <!-- Sección adicional -->

@@ -85,3 +85,28 @@ footer a:hover {
         transform: translateY(0);
     }
 }
+
+/* Botón de Videojuegos */
+.btn-info {
+    background-color: #17a2b8; /* Azul claro */
+    border: none;
+}
+
+.btn-info:hover {
+    background-color: #117a8b;
+    transform: scale(1.1);
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Botón de Spotify */
+.btn-warning {
+    background-color: #ffc107; /* Amarillo */
+    border: none;
+}
+
+.btn-warning:hover {
+    background-color: #e0a800;
+    transform: scale(1.1);
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+}
+
