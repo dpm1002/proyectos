@@ -1,4 +1,5 @@
 from app import db
+from datetime import datetime
 
 class Book(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -41,3 +42,13 @@ class Game(db.Model):
 
     def __repr__(self):
         return f"<Manga {self.title}>"
+
+class Transaction(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    transaction_type = db.Column(db.String(10))  # "ingreso" o "gasto"
+    category = db.Column(db.String(50))         # categoría según lo que elijas
+    amount = db.Column(db.Float)
+    date = db.Column(db.DateTime, default=datetime.utcnow)
+
+    def __repr__(self):
+        return f"<Transaction {self.id} {self.transaction_type} {self.amount}>"

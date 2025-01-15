@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for
 import requests
 from app import db
-from app.models import Book, Manga, Game
+from app.models import Book, Manga, Game, Transaction
 from dotenv import load_dotenv
 from flask import session
 import os
@@ -421,6 +421,51 @@ def get_categories():
             categories.update(book.get("volumeInfo", {}).get("categories", []))
     
     return {"categories": list(categories)}
+
+@bp.route("/finanzas", methods=["GET", "POST"])
+def finanzas():
+    if request.method == "POST":
+        transaction_type = request.form.get("transaction_type")
+        category = request.form.get("category")
+        amount = request.form.get("amount", type=float)
+
+        # Crear objeto Transaction y guardarlo en DB
+        new_transaction = Transaction(
+            transaction_type=transaction_type,
+            category=category,
+            amount=amount
+        )
+        db.session.add(new_transaction)
+        db.session.commit()
+
+        return redirect(url_for("routes.finanzas"))  # Redirige para limpiar el formulario
+
+    # Si es GET, mostramos la página
+    # Obtenemos todas las transacciones para listarlas
+    transactions = Transaction.query.all()
+
+    return render_template(
+        "finanzas.html",
+        transactions=transactions
+    )
+
+@bp.route("/finanzas/grafico")
+def finanzas_grafico():
+    # Obtenemos todas las transacciones
+    transactions = Transaction.query.all()
+
+    # Separamos ingresos y gastos
+    total_ingresos = sum(t.amount for t in transactions if t.transaction_type == "ingreso")
+    total_gastos = sum(t.amount for t in transactions if t.transaction_type == "gasto")
+    balance = total_ingresos - total_gastos
+
+    # Puedes pasar estos datos al template para renderizarlos con Chart.js
+    return render_template(
+        "finanzas_grafico.html",
+        total_ingresos=total_ingresos,
+        total_gastos=total_gastos,
+        balance=balance
+    )
 
 
 @bp.route("/libros")

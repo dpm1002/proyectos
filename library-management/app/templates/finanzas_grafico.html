@@ -1,0 +1,55 @@
+<!-- templates/finanzas_grafico.html -->
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container my-4">
+    <h2 class="mb-3">Gráfico de Ingresos vs. Gastos</h2>
+
+    <div class="row">
+        <div class="col-md-6">
+            <canvas id="myChart"></canvas>
+        </div>
+        <div class="col-md-6 d-flex align-items-center">
+            <div>
+                <h4>Resumen</h4>
+                <p><strong>Total Ingresos:</strong> {{ total_ingresos }}</p>
+                <p><strong>Total Gastos:</strong> {{ total_gastos }}</p>
+                
+                {% if balance >= 0 %}
+                    <p class="text-success"><strong>Balance:</strong> +{{ balance }}</p>
+                {% else %}
+                    <p class="text-danger"><strong>Balance:</strong> {{ balance }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Script de Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const ctx = document.getElementById('myChart').getContext('2d');
+    const myChart = new Chart(ctx, {
+        type: 'pie', // o bar, doughnut, etc.
+        data: {
+            labels: ['Ingresos', 'Gastos'],
+            datasets: [{
+                label: 'Ingresos vs. Gastos',
+                data: [{{ total_ingresos }}, {{ total_gastos }}],
+                backgroundColor: [
+                    'rgba(54, 162, 235, 0.5)',  // Azul para ingresos
+                    'rgba(255, 99, 132, 0.5)'   // Rojo para gastos
+                ],
+                borderColor: [
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 99, 132, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true
+        }
+    });
+</script>
+{% endblock %}
