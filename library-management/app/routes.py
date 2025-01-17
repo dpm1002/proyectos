@@ -18,9 +18,11 @@ SPOTIFY_AUTH_URL = "https://accounts.spotify.com/authorize"
 SPOTIFY_TOKEN_URL = "https://accounts.spotify.com/api/token"
 SPOTIFY_API_URL = "https://api.spotify.com/v1"
 
+
 @bp.route("/")
 def index():
     return render_template("index.html")
+
 
 @bp.route("/spotify/login")
 def spotify_login():
@@ -31,6 +33,7 @@ def spotify_login():
         f"&scope={scope}"
     )
     return redirect(auth_url)
+
 
 @bp.route("/spotify/callback")
 def spotify_callback():
@@ -61,12 +64,16 @@ def spotify_player():
     # Obtener información del perfil
     profile_response = requests.get(f"{SPOTIFY_API_URL}/me", headers=headers)
     profile_data = profile_response.json() if profile_response.status_code == 200 else None
-    print("Perfil del usuario:", profile_data)  # Verificar la respuesta en los logs
+    # Verificar la respuesta en los logs
+    print("Perfil del usuario:", profile_data)
 
     # Obtener listas de reproducción
-    playlists_response = requests.get(f"{SPOTIFY_API_URL}/me/playlists", headers=headers)
-    playlists_data = playlists_response.json().get("items", []) if playlists_response.status_code == 200 else []
-    print("Listas de reproducción:", playlists_data)  # Verificar la respuesta en los logs
+    playlists_response = requests.get(
+        f"{SPOTIFY_API_URL}/me/playlists", headers=headers)
+    playlists_data = playlists_response.json().get(
+        "items", []) if playlists_response.status_code == 200 else []
+    # Verificar la respuesta en los logs
+    print("Listas de reproducción:", playlists_data)
 
     # Si no hay datos en el perfil o playlists, devuelve un mensaje
     if not profile_data:
@@ -76,7 +83,6 @@ def spotify_player():
 
     # Pasar los datos al template
     return render_template("spotify_player.html", profile=profile_data, playlists=playlists_data, access_token=access_token)
-
 
 
 @bp.route("/spotify/stats")
@@ -110,20 +116,23 @@ def user_stats():
                 tracks_by_month[month] = {}
 
             track_id = track["id"]
-            tracks_by_month[month][track_id] = tracks_by_month[month].get(track_id, 0) + 1
+            tracks_by_month[month][track_id] = tracks_by_month[month].get(
+                track_id, 0) + 1
 
     # Procesar canciones más escuchadas
     if response_top_tracks.status_code == 200:
         top_tracks = response_top_tracks.json().get("items", [])
         for track in top_tracks:
             album = track.get("album", {})
-            release_date = album.get("release_date", "1900-01-01")  # Fecha en formato ISO
+            # Fecha en formato ISO
+            release_date = album.get("release_date", "1900-01-01")
             month = release_date[:7]
             if month not in tracks_by_month:
                 tracks_by_month[month] = {}
 
             track_id = track["id"]
-            tracks_by_month[month][track_id] = tracks_by_month[month].get(track_id, 0) + 1
+            tracks_by_month[month][track_id] = tracks_by_month[month].get(
+                track_id, 0) + 1
 
     # Crear una lista ordenada por mes y popularidad
     sorted_tracks_by_month = {}
@@ -146,10 +155,6 @@ def user_stats():
 
     # Renderizar la plantilla
     return render_template("spotify_stats.html", tracks_by_month=detailed_tracks_by_month)
-
-
-
-
 
 
 def refresh_token():
@@ -199,7 +204,8 @@ def search_game():
 @bp.route("/searchBOOK", methods=["POST"])
 def searchBook():
     query = request.form.get("query")  # Texto de búsqueda
-    filter_categories = request.form.getlist("filter_category")  # Géneros seleccionados (lista)
+    filter_categories = request.form.getlist(
+        "filter_category")  # Géneros seleccionados (lista)
 
     if not query and not filter_categories:
         return "Debe proporcionar un término de búsqueda o seleccionar al menos un género.", 400
@@ -227,8 +233,6 @@ def searchBook():
         return f"Error al conectar con la API de Google Books: {e}", 500
 
 
-
-
 @bp.route("/book/<int:book_id>/update_genres", methods=["POST"])
 def update_book_genres(book_id):
     book = Book.query.get_or_404(book_id)
@@ -245,7 +249,6 @@ def searchManga():
         return render_template("manga_results.html", mangas=results)
     return render_template("manga_search.html")
 
-    
 
 def search_manga(query):
     url = f"https://api.jikan.moe/v4/manga"
@@ -277,7 +280,8 @@ def search_manga(query):
     else:
         print(f"Error al conectar con Jikan API: {response.status_code}")
         return []
-    
+
+
 @bp.route("/add_game", methods=["POST"])
 def add_game():
     game_data = request.form
@@ -306,10 +310,12 @@ def add_game():
 
     return redirect(url_for("routes.library"))
 
+
 @bp.route("/game/<int:game_id>")
 def game_details(game_id):
     game = Game.query.get_or_404(game_id)
     return render_template("game_details.html", game=game)
+
 
 @bp.route("/game/<int:game_id>/update", methods=["POST"])
 def update_game(game_id):
@@ -320,7 +326,7 @@ def update_game(game_id):
     db.session.commit()
     return redirect(url_for("routes.game_details", game_id=game_id))
 
-    
+
 @bp.route("/add_manga", methods=["POST"])
 def add_manga():
     manga_data = request.form
@@ -351,6 +357,7 @@ def add_manga():
 
     return redirect(url_for("routes.library"))
 
+
 @bp.route("/manga/<int:manga_id>/update", methods=["POST"])
 def update_manga(manga_id):
     manga = Manga.query.get_or_404(manga_id)
@@ -359,8 +366,6 @@ def update_manga(manga_id):
     manga.status = request.form.get("status")
     db.session.commit()
     return redirect(url_for("routes.manga_details", manga_id=manga_id))
-
-
 
 
 @bp.route("/add_book", methods=["POST"])
@@ -378,6 +383,7 @@ def add_book():
     db.session.commit()
     return redirect(url_for("routes.library"))
 
+
 @bp.route("/book/<int:book_id>/update", methods=["POST"])
 def update_book(book_id):
     book = Book.query.get_or_404(book_id)
@@ -388,12 +394,12 @@ def update_book(book_id):
     return redirect(url_for("routes.book_details", book_id=book_id))
 
 
-
 @bp.route("/book/<int:book_id>")
 def book_details(book_id):
     # Obtener el libro de la base de datos
     book = Book.query.get_or_404(book_id)
     return render_template("book_details.html", book=book)
+
 
 @bp.route("/manga/<int:manga_id>")
 def manga_details(manga_id):
@@ -409,6 +415,7 @@ def library():
     games = Game.query.all()
     return render_template("library.html", books=books, mangas=mangas, games=games)
 
+
 @bp.route("/get_categories", methods=["GET"])
 def get_categories():
     url = "https://www.googleapis.com/books/v1/volumes?q=science"
@@ -419,8 +426,9 @@ def get_categories():
         books = response.json().get("items", [])
         for book in books:
             categories.update(book.get("volumeInfo", {}).get("categories", []))
-    
+
     return {"categories": list(categories)}
+
 
 @bp.route("/finanzas", methods=["GET", "POST"])
 def finanzas():
@@ -438,7 +446,8 @@ def finanzas():
         db.session.add(new_transaction)
         db.session.commit()
 
-        return redirect(url_for("routes.finanzas"))  # Redirige para limpiar el formulario
+        # Redirige para limpiar el formulario
+        return redirect(url_for("routes.finanzas"))
 
     # Si es GET, mostramos la página
     # Obtenemos todas las transacciones para listarlas
@@ -449,14 +458,17 @@ def finanzas():
         transactions=transactions
     )
 
+
 @bp.route("/finanzas/grafico")
 def finanzas_grafico():
     # Obtenemos todas las transacciones
     transactions = Transaction.query.all()
 
     # Separamos ingresos y gastos
-    total_ingresos = sum(t.amount for t in transactions if t.transaction_type == "ingreso")
-    total_gastos = sum(t.amount for t in transactions if t.transaction_type == "gasto")
+    total_ingresos = sum(
+        t.amount for t in transactions if t.transaction_type == "ingreso")
+    total_gastos = sum(
+        t.amount for t in transactions if t.transaction_type == "gasto")
     balance = total_ingresos - total_gastos
 
     # Puedes pasar estos datos al template para renderizarlos con Chart.js
@@ -472,9 +484,11 @@ def finanzas_grafico():
 def libros():
     return render_template("libros.html")
 
+
 @bp.route("/manga")
 def manga():
     return render_template("manga.html")
+
 
 @bp.route("/games")
 def games():

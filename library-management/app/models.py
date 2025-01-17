@@ -1,6 +1,7 @@
 from app import db
 from datetime import datetime
 
+
 class Book(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(200), nullable=False)
@@ -12,7 +13,8 @@ class Book(db.Model):
     user_rating = db.Column(db.Float, nullable=True)
     user_description = db.Column(db.Text, nullable=True)
     status = db.Column(db.String(20), nullable=True)
-    genres = db.Column(db.String(200), nullable=True)  # Campo para géneros personalizados
+    # Campo para géneros personalizados
+    genres = db.Column(db.String(200), nullable=True)
 
 
 class Manga(db.Model):
@@ -25,8 +27,10 @@ class Manga(db.Model):
     image_url = db.Column(db.String(300), nullable=True)
     # Para el usuario
     user_rating = db.Column(db.Float, nullable=True)  # Valoración del usuario
-    user_description = db.Column(db.Text, nullable=True)  # Descripción personalizada
+    # Descripción personalizada
+    user_description = db.Column(db.Text, nullable=True)
     status = db.Column(db.String(20), nullable=True)  # Estado
+
 
 class Game(db.Model):
     id = db.Column(db.Integer, primary_key=True)  # ID de RAWG
@@ -36,12 +40,13 @@ class Game(db.Model):
     image_url = db.Column(db.String(300), nullable=True)
     # Para el usuario
     user_rating = db.Column(db.Float, nullable=True)  # Valoración del usuario
-    user_description = db.Column(db.Text, nullable=True)  # Descripción personalizada
+    # Descripción personalizada
+    user_description = db.Column(db.Text, nullable=True)
     status = db.Column(db.String(20), nullable=True)  # Estado
-
 
     def __repr__(self):
         return f"<Manga {self.title}>"
+
 
 class Transaction(db.Model):
     id = db.Column(db.Integer, primary_key=True)
