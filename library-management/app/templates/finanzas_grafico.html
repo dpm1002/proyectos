@@ -21,68 +21,74 @@
 
 <!-- Script de Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <script>
-    async function fetchAndRenderData() {
-        const totalIngresosElem = document.getElementById("total-ingresos");
-        const totalGastosElem = document.getElementById("total-gastos");
-        const balanceSummaryElem = document.getElementById("balance-summary");
-        const ctx = document.getElementById("myChart").getContext("2d");
+    document.addEventListener("DOMContentLoaded", async function () {
+        // Inicializar Firestore (asegúrate de que Firebase ya esté configurado en tu base.html)
+        const db = firebase.firestore();
 
-        let totalIngresos = 0;
-        let totalGastos = 0;
+        async function fetchAndRenderData() {
+            const totalIngresosElem = document.getElementById("total-ingresos");
+            const totalGastosElem = document.getElementById("total-gastos");
+            const balanceSummaryElem = document.getElementById("balance-summary");
+            const ctx = document.getElementById("myChart").getContext("2d");
 
-        try {
-            // Obtener todas las transacciones desde Firebase Firestore
-            const snapshot = await db.collection("transactions").get();
-            snapshot.forEach(doc => {
-                const transaction = doc.data();
-                if (transaction.transaction_type === "ingreso") {
-                    totalIngresos += transaction.amount;
-                } else if (transaction.transaction_type === "gasto") {
-                    totalGastos += transaction.amount;
+            let totalIngresos = 0;
+            let totalGastos = 0;
+
+            try {
+                // Obtener todas las transacciones desde la colección "transactions" en Firestore
+                const snapshot = await db.collection("transactions").get();
+                snapshot.forEach(doc => {
+                    const transaction = doc.data();
+                    if (transaction.transaction_type === "ingreso") {
+                        totalIngresos += transaction.amount;
+                    } else if (transaction.transaction_type === "gasto") {
+                        totalGastos += transaction.amount;
+                    }
+                });
+
+                // Actualizar los totales en la interfaz
+                totalIngresosElem.textContent = totalIngresos.toFixed(2);
+                totalGastosElem.textContent = totalGastos.toFixed(2);
+
+                // Calcular y mostrar el balance
+                const balance = totalIngresos - totalGastos;
+                if (balance >= 0) {
+                    balanceSummaryElem.innerHTML = `<p class="text-success"><strong>Balance:</strong> +${balance.toFixed(2)} €</p>`;
+                } else {
+                    balanceSummaryElem.innerHTML = `<p class="text-danger"><strong>Balance:</strong> ${balance.toFixed(2)} €</p>`;
                 }
-            });
 
-            // Actualizar los totales en la interfaz
-            totalIngresosElem.textContent = totalIngresos.toFixed(2);
-            totalGastosElem.textContent = totalGastos.toFixed(2);
-
-            // Mostrar balance
-            const balance = totalIngresos - totalGastos;
-            if (balance >= 0) {
-                balanceSummaryElem.innerHTML = `<p class="text-success"><strong>Balance:</strong> +${balance.toFixed(2)} €</p>`;
-            } else {
-                balanceSummaryElem.innerHTML = `<p class="text-danger"><strong>Balance:</strong> ${balance.toFixed(2)} €</p>`;
+                // Renderizar gráfico con Chart.js
+                new Chart(ctx, {
+                    type: 'pie',
+                    data: {
+                        labels: ['Ingresos', 'Gastos'],
+                        datasets: [{
+                            data: [totalIngresos, totalGastos],
+                            backgroundColor: [
+                                'rgba(54, 162, 235, 0.5)',  // Azul para ingresos
+                                'rgba(255, 99, 132, 0.5)'   // Rojo para gastos
+                            ],
+                            borderColor: [
+                                'rgba(54, 162, 235, 1)',
+                                'rgba(255, 99, 132, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true
+                    }
+                });
+            } catch (error) {
+                console.error("Error al obtener datos de Firestore:", error);
             }
-
-            // Renderizar gráfico
-            new Chart(ctx, {
-                type: 'pie',
-                data: {
-                    labels: ['Ingresos', 'Gastos'],
-                    datasets: [{
-                        data: [totalIngresos, totalGastos],
-                        backgroundColor: [
-                            'rgba(54, 162, 235, 0.5)',  // Azul para ingresos
-                            'rgba(255, 99, 132, 0.5)'   // Rojo para gastos
-                        ],
-                        borderColor: [
-                            'rgba(54, 162, 235, 1)',
-                            'rgba(255, 99, 132, 1)'
-                        ],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true
-                }
-            });
-        } catch (error) {
-            console.error("Error al obtener datos de Firestore:", error);
         }
-    }
 
-    // Cargar los datos y renderizar al cargar la página
-    document.addEventListener("DOMContentLoaded", fetchAndRenderData);
+        // Ejecutamos la función para cargar datos y pintar el gráfico
+        await fetchAndRenderData();
+    });
 </script>
 {% endblock %}
