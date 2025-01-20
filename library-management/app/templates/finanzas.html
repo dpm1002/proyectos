@@ -73,6 +73,8 @@
         const form = document.getElementById("transaction-form");
         const transactionsBody = document.getElementById("transactions-body");
 
+        const db = firebase.firestore(); // Inicializar Firestore
+
         // Mostrar/ocultar categorías según el tipo de transacción
         transactionTypeSelect.addEventListener("change", function () {
             if (this.value) {

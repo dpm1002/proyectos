@@ -1,13 +1,8 @@
-from flask import Blueprint, render_template, request, redirect, url_for
+from flask import Blueprint, render_template, request, redirect, url_for, session
 import requests
-from app import db
-from app.models import Book, Manga, Game, Transaction
-from dotenv import load_dotenv
-from flask import session
-import os
 from datetime import datetime
-
-load_dotenv()
+from firebase_admin import firestore
+import os
 
 bp = Blueprint('routes', __name__)
 
@@ -19,9 +14,139 @@ SPOTIFY_TOKEN_URL = "https://accounts.spotify.com/api/token"
 SPOTIFY_API_URL = "https://api.spotify.com/v1"
 
 
+def get_firestore_db():
+    from flask import current_app
+    return current_app.firestore_db
+
+
 @bp.route("/")
 def index():
     return render_template("index.html")
+
+
+@bp.route("/library")
+def library():
+    db = get_firestore_db()
+    books = [doc.to_dict() for doc in db.collection('books').stream()]
+    mangas = [doc.to_dict() for doc in db.collection('mangas').stream()]
+    games = [doc.to_dict() for doc in db.collection('games').stream()]
+
+    return render_template("library.html", books=books, mangas=mangas, games=games)
+
+
+@bp.route("/add_book", methods=["POST"])
+def add_book():
+    db = get_firestore_db()
+    book_data = request.form
+
+    book_ref = db.collection('books').document()
+    book_ref.set({
+        'title': book_data["title"],
+        'author': book_data["author"],
+        'series': book_data.get("series"),
+        'published_date': book_data.get("published_date"),
+        'description': book_data.get("description"),
+        'image_url': book_data.get("image_url")
+    })
+
+    return redirect(url_for("routes.library"))
+
+
+@bp.route("/book/<book_id>")
+def book_details(book_id):
+    db = get_firestore_db()
+    book = db.collection('books').document(book_id).get().to_dict()
+    return render_template("book_details.html", book=book)
+
+
+@bp.route("/book/<book_id>/update", methods=["POST"])
+def update_book(book_id):
+    db = get_firestore_db()
+    book_data = request.form
+
+    db.collection('books').document(book_id).update({
+        'user_rating': float(book_data.get("user_rating", 0)),
+        'user_description': book_data.get("user_description"),
+        'status': book_data.get("status")
+    })
+
+    return redirect(url_for("routes.book_details", book_id=book_id))
+
+
+@bp.route("/add_manga", methods=["POST"])
+def add_manga():
+    db = get_firestore_db()
+    manga_data = request.form
+
+    manga_ref = db.collection('mangas').document()
+    manga_ref.set({
+        'title': manga_data["title"],
+        'description': manga_data.get("description"),
+        'original_language': manga_data.get("original_language", "ja"),
+        'year': manga_data.get("year"),
+        'content_rating': manga_data.get("content_rating", "safe"),
+        'image_url': manga_data.get("image_url")
+    })
+
+    return redirect(url_for("routes.library"))
+
+
+@bp.route("/manga/<manga_id>")
+def manga_details(manga_id):
+    db = get_firestore_db()
+    manga = db.collection('mangas').document(manga_id).get().to_dict()
+    return render_template("manga_details.html", manga=manga)
+
+
+@bp.route("/manga/<manga_id>/update", methods=["POST"])
+def update_manga(manga_id):
+    db = get_firestore_db()
+    manga_data = request.form
+
+    db.collection('mangas').document(manga_id).update({
+        'user_rating': float(manga_data.get("user_rating", 0)),
+        'user_description': manga_data.get("user_description"),
+        'status': manga_data.get("status")
+    })
+
+    return redirect(url_for("routes.manga_details", manga_id=manga_id))
+
+
+@bp.route("/add_game", methods=["POST"])
+def add_game():
+    db = get_firestore_db()
+    game_data = request.form
+
+    game_ref = db.collection('games').document()
+    game_ref.set({
+        'title': game_data["title"],
+        'released': game_data.get("released"),
+        'rating': game_data.get("rating"),
+        'image_url': game_data.get("image_url")
+    })
+
+    return redirect(url_for("routes.library"))
+
+
+@bp.route("/game/<game_id>")
+def game_details(game_id):
+    db = get_firestore_db()
+    game = db.collection('games').document(game_id).get().to_dict()
+    return render_template("game_details.html", game=game)
+
+
+@bp.route("/game/<game_id>/update", methods=["POST"])
+def update_game(game_id):
+    db = get_firestore_db()
+    game_data = request.form
+
+    db.collection('games').document(game_id).update({
+        'user_rating': float(game_data.get("user_rating", 0)),
+        'user_description': game_data.get("user_description"),
+        'status': game_data.get("status")
+    })
+
+    return redirect(url_for("routes.game_details", game_id=game_id))
 
 
 @bp.route("/spotify/login")
@@ -61,27 +186,19 @@ def spotify_player():
 
     headers = {"Authorization": f"Bearer {access_token}"}
 
-    # Obtener información del perfil
     profile_response = requests.get(f"{SPOTIFY_API_URL}/me", headers=headers)
     profile_data = profile_response.json() if profile_response.status_code == 200 else None
-    # Verificar la respuesta en los logs
-    print("Perfil del usuario:", profile_data)
 
-    # Obtener listas de reproducción
     playlists_response = requests.get(
         f"{SPOTIFY_API_URL}/me/playlists", headers=headers)
     playlists_data = playlists_response.json().get(
         "items", []) if playlists_response.status_code == 200 else []
-    # Verificar la respuesta en los logs
-    print("Listas de reproducción:", playlists_data)
 
-    # Si no hay datos en el perfil o playlists, devuelve un mensaje
     if not profile_data:
         return "No se pudo obtener el perfil del usuario. Por favor, inicia sesión nuevamente.", 500
     if not playlists_data:
         return "No se encontraron listas de reproducción. Por favor, verifica tu cuenta de Spotify.", 500
 
-    # Pasar los datos al template
     return render_template("spotify_player.html", profile=profile_data, playlists=playlists_data, access_token=access_token)
 
 
@@ -93,25 +210,22 @@ def user_stats():
 
     headers = {"Authorization": f"Bearer {access_token}"}
 
-    # Obtener canciones reproducidas recientemente
     response_recently_played = requests.get(
         "https://api.spotify.com/v1/me/player/recently-played?limit=50", headers=headers
     )
 
-    # Obtener canciones más escuchadas a largo plazo
     response_top_tracks = requests.get(
         "https://api.spotify.com/v1/me/top/tracks?time_range=long_term&limit=50", headers=headers
     )
 
     tracks_by_month = {}
 
-    # Procesar canciones reproducidas recientemente
     if response_recently_played.status_code == 200:
         recently_played = response_recently_played.json().get("items", [])
         for item in recently_played:
-            played_at = item["played_at"]  # Fecha en formato ISO
+            played_at = item["played_at"]
             track = item["track"]
-            month = played_at[:7]  # Extrae "YYYY-MM" para el mes
+            month = played_at[:7]
             if month not in tracks_by_month:
                 tracks_by_month[month] = {}
 
@@ -119,12 +233,10 @@ def user_stats():
             tracks_by_month[month][track_id] = tracks_by_month[month].get(
                 track_id, 0) + 1
 
-    # Procesar canciones más escuchadas
     if response_top_tracks.status_code == 200:
         top_tracks = response_top_tracks.json().get("items", [])
         for track in top_tracks:
             album = track.get("album", {})
-            # Fecha en formato ISO
             release_date = album.get("release_date", "1900-01-01")
             month = release_date[:7]
             if month not in tracks_by_month:
@@ -134,15 +246,13 @@ def user_stats():
             tracks_by_month[month][track_id] = tracks_by_month[month].get(
                 track_id, 0) + 1
 
-    # Crear una lista ordenada por mes y popularidad
     sorted_tracks_by_month = {}
     for month, tracks in tracks_by_month.items():
         sorted_tracks = sorted(
             tracks.items(), key=lambda x: x[1], reverse=True
-        )[:5]  # Top 5 canciones por mes
+        )[:5]
         sorted_tracks_by_month[month] = sorted_tracks
 
-    # Obtener detalles de las canciones
     detailed_tracks_by_month = {}
     for month, tracks in sorted_tracks_by_month.items():
         detailed_tracks_by_month[month] = []
@@ -153,43 +263,19 @@ def user_stats():
             if track_response.status_code == 200:
                 detailed_tracks_by_month[month].append(track_response.json())
 
-    # Renderizar la plantilla
     return render_template("spotify_stats.html", tracks_by_month=detailed_tracks_by_month)
-
-
-def refresh_token():
-    refresh_token = session.get("refresh_token")
-    if not refresh_token:
-        return "No refresh token disponible. Por favor, inicia sesión.", 401
-
-    response = requests.post(
-        "https://accounts.spotify.com/api/token",
-        data={
-            "grant_type": "refresh_token",
-            "refresh_token": refresh_token,
-            "client_id": SPOTIFY_CLIENT_ID,
-            "client_secret": SPOTIFY_CLIENT_SECRET,
-        },
-    )
-
-    if response.status_code == 200:
-        tokens = response.json()
-        session["access_token"] = tokens.get("access_token")
-        return "Token renovado exitosamente."
-    else:
-        return f"Error al renovar token: {response.status_code}, {response.text}", 500
 
 
 @bp.route("/search_game", methods=["GET", "POST"])
 def search_game():
     if request.method == "POST":
         query = request.form.get("query")
-        api_key = "9422c4d6ee1c4a90b9e87e170f5f2aac"  # Reemplaza con tu clave de RAWG
+        api_key = "9422c4d6ee1c4a90b9e87e170f5f2aac"
         url = f"https://api.rawg.io/api/games"
         params = {
             "key": api_key,
             "search": query,
-            "page_size": 50,  # Limita los resultados
+            "page_size": 50,
         }
 
         response = requests.get(url, params=params)
@@ -203,21 +289,17 @@ def search_game():
 
 @bp.route("/searchBOOK", methods=["POST"])
 def searchBook():
-    query = request.form.get("query")  # Texto de búsqueda
-    filter_categories = request.form.getlist(
-        "filter_category")  # Géneros seleccionados (lista)
+    query = request.form.get("query")
+    filter_categories = request.form.getlist("filter_category")
 
     if not query and not filter_categories:
         return "Debe proporcionar un término de búsqueda o seleccionar al menos un género.", 400
 
-    # Base de la URL
     url = "https://www.googleapis.com/books/v1/volumes?q="
 
-    # Construcción de la consulta de texto
     if query:
         url += query
 
-    # Construcción de la consulta de géneros (OR lógico)
     if filter_categories:
         if query:
             url += "+"
@@ -233,21 +315,11 @@ def searchBook():
         return f"Error al conectar con la API de Google Books: {e}", 500
 
 
-@bp.route("/book/<int:book_id>/update_genres", methods=["POST"])
-def update_book_genres(book_id):
-    book = Book.query.get_or_404(book_id)
-    book.genres = request.form.get("genres")
-    db.session.commit()
-    return redirect(url_for("routes.book_details", book_id=book_id))
-
-
 @bp.route("/searchMANGA", methods=["POST"])
 def searchManga():
-    if request.method == "POST":
-        query = request.form.get("query")
-        results = search_manga(query)
-        return render_template("manga_results.html", mangas=results)
-    return render_template("manga_search.html")
+    query = request.form.get("query")
+    results = search_manga(query)
+    return render_template("manga_results.html", mangas=results)
 
 
 def search_manga(query):
@@ -282,207 +354,47 @@ def search_manga(query):
         return []
 
 
-@bp.route("/add_game", methods=["POST"])
-def add_game():
-    game_data = request.form
-
-    # Verificar si el juego ya existe
-    existing_game = Game.query.get(game_data["id"])
-    if existing_game:
-        print(f"El juego ya existe en la base de datos: {existing_game.title}")
-        return redirect(url_for("routes.library"))
-
-    try:
-        # Crear un nuevo objeto Game
-        game = Game(
-            id=game_data["id"],
-            title=game_data["title"],
-            released=game_data.get("released"),
-            rating=game_data.get("rating"),
-            image_url=game_data.get("image_url"),
-        )
-        db.session.add(game)
-        db.session.commit()
-        print(f"Juego guardado: {game.title}")
-    except Exception as e:
-        print(f"Error al guardar el juego: {e}")
-        db.session.rollback()
-
-    return redirect(url_for("routes.library"))
-
-
-@bp.route("/game/<int:game_id>")
-def game_details(game_id):
-    game = Game.query.get_or_404(game_id)
-    return render_template("game_details.html", game=game)
-
-
-@bp.route("/game/<int:game_id>/update", methods=["POST"])
-def update_game(game_id):
-    game = Game.query.get_or_404(game_id)
-    game.user_rating = request.form.get("user_rating", type=float)
-    game.user_description = request.form.get("user_description")
-    game.status = request.form.get("status")
-    db.session.commit()
-    return redirect(url_for("routes.game_details", game_id=game_id))
-
-
-@bp.route("/add_manga", methods=["POST"])
-def add_manga():
-    manga_data = request.form
-
-    # Verificar si el manga ya existe en la base de datos
-    existing_manga = Manga.query.get(manga_data["id"])
-    if existing_manga:
-        print(f"Manga ya existe en la base de datos: {existing_manga.title}")
-        return redirect(url_for("routes.library"))
-
-    try:
-        # Crear un nuevo objeto Manga si no existe
-        manga = Manga(
-            id=manga_data["id"],
-            title=manga_data["title"],
-            description=manga_data.get("description", ""),
-            original_language="ja",  # Idioma predeterminado
-            year=manga_data.get("year"),
-            content_rating=manga_data.get("content_rating", "safe"),
-            image_url=manga_data.get("image_url", ""),
-        )
-        db.session.add(manga)
-        db.session.commit()
-        print(f"Manga guardado: {manga.title}")
-    except Exception as e:
-        print(f"Error al guardar el manga: {e}")
-        db.session.rollback()  # Revertir la transacción en caso de error
-
-    return redirect(url_for("routes.library"))
-
-
-@bp.route("/manga/<int:manga_id>/update", methods=["POST"])
-def update_manga(manga_id):
-    manga = Manga.query.get_or_404(manga_id)
-    manga.user_rating = request.form.get("user_rating", type=float)
-    manga.user_description = request.form.get("user_description")
-    manga.status = request.form.get("status")
-    db.session.commit()
-    return redirect(url_for("routes.manga_details", manga_id=manga_id))
-
-
-@bp.route("/add_book", methods=["POST"])
-def add_book():
-    book_data = request.form
-    book = Book(
-        title=book_data["title"],
-        author=book_data["author"],
-        series=book_data.get("series"),
-        published_date=book_data.get("published_date"),
-        description=book_data.get("description"),
-        image_url=book_data.get("image_url")
-    )
-    db.session.add(book)
-    db.session.commit()
-    return redirect(url_for("routes.library"))
-
-
-@bp.route("/book/<int:book_id>/update", methods=["POST"])
-def update_book(book_id):
-    book = Book.query.get_or_404(book_id)
-    book.user_rating = request.form.get("user_rating", type=float)
-    book.user_description = request.form.get("user_description")
-    book.status = request.form.get("status")
-    db.session.commit()
-    return redirect(url_for("routes.book_details", book_id=book_id))
-
-
-@bp.route("/book/<int:book_id>")
-def book_details(book_id):
-    # Obtener el libro de la base de datos
-    book = Book.query.get_or_404(book_id)
-    return render_template("book_details.html", book=book)
-
-
-@bp.route("/manga/<int:manga_id>")
-def manga_details(manga_id):
-    # Obtener el manga de la base de datos
-    manga = Manga.query.get_or_404(manga_id)
-    return render_template("manga_details.html", manga=manga)
-
-
-@bp.route("/library")
-def library():
-    books = Book.query.all()
-    mangas = Manga.query.all()
-    games = Game.query.all()
-    return render_template("library.html", books=books, mangas=mangas, games=games)
-
-
-@bp.route("/get_categories", methods=["GET"])
-def get_categories():
-    url = "https://www.googleapis.com/books/v1/volumes?q=science"
-    response = requests.get(url)
-    categories = set()
-
-    if response.status_code == 200:
-        books = response.json().get("items", [])
-        for book in books:
-            categories.update(book.get("volumeInfo", {}).get("categories", []))
-
-    return {"categories": list(categories)}
+@bp.route("/libros")
+def libros():
+    return render_template("libros.html")
 
 
 @bp.route("/finanzas", methods=["GET", "POST"])
 def finanzas():
+    db = get_firestore_db()
+
     if request.method == "POST":
         transaction_type = request.form.get("transaction_type")
         category = request.form.get("category")
-        amount = request.form.get("amount", type=float)
+        amount = float(request.form.get("amount", 0))
 
-        # Crear objeto Transaction y guardarlo en DB
-        new_transaction = Transaction(
-            transaction_type=transaction_type,
-            category=category,
-            amount=amount
-        )
-        db.session.add(new_transaction)
-        db.session.commit()
+        db.collection('transactions').add({
+            'transaction_type': transaction_type,
+            'category': category,
+            'amount': amount,
+            'date': datetime.utcnow()
+        })
 
-        # Redirige para limpiar el formulario
         return redirect(url_for("routes.finanzas"))
 
-    # Si es GET, mostramos la página
-    # Obtenemos todas las transacciones para listarlas
-    transactions = Transaction.query.all()
-
-    return render_template(
-        "finanzas.html",
-        transactions=transactions
-    )
+    transactions = [doc.to_dict()
+                    for doc in db.collection('transactions').stream()]
+    return render_template("finanzas.html", transactions=transactions)
 
 
 @bp.route("/finanzas/grafico")
 def finanzas_grafico():
-    # Obtenemos todas las transacciones
-    transactions = Transaction.query.all()
+    db = get_firestore_db()
 
-    # Separamos ingresos y gastos
-    total_ingresos = sum(
-        t.amount for t in transactions if t.transaction_type == "ingreso")
-    total_gastos = sum(
-        t.amount for t in transactions if t.transaction_type == "gasto")
+    transactions = [doc.to_dict()
+                    for doc in db.collection('transactions').stream()]
+    total_ingresos = sum(t['amount']
+                         for t in transactions if t['transaction_type'] == "ingreso")
+    total_gastos = sum(t['amount']
+                       for t in transactions if t['transaction_type'] == "gasto")
     balance = total_ingresos - total_gastos
 
-    # Puedes pasar estos datos al template para renderizarlos con Chart.js
-    return render_template(
-        "finanzas_grafico.html",
-        total_ingresos=total_ingresos,
-        total_gastos=total_gastos,
-        balance=balance
-    )
-
-
-@bp.route("/libros")
-def libros():
-    return render_template("libros.html")
+    return render_template("finanzas_grafico.html", total_ingresos=total_ingresos, total_gastos=total_gastos, balance=balance)
 
 
 @bp.route("/manga")

@@ -1,59 +1,34 @@
-from app import db
-from datetime import datetime
+class Book:
+    def __init__(self, title, author, series=None, published_date=None, description=None, image_url=None):
+        self.title = title
+        self.author = author
+        self.series = series
+        self.published_date = published_date
+        self.description = description
+        self.image_url = image_url
 
 
-class Book(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(200), nullable=False)
-    author = db.Column(db.String(100), nullable=False)
-    series = db.Column(db.String(100))
-    published_date = db.Column(db.String(20))
-    description = db.Column(db.Text)
-    image_url = db.Column(db.String(300))
-    user_rating = db.Column(db.Float, nullable=True)
-    user_description = db.Column(db.Text, nullable=True)
-    status = db.Column(db.String(20), nullable=True)
-    # Campo para géneros personalizados
-    genres = db.Column(db.String(200), nullable=True)
+class Manga:
+    def __init__(self, title, description=None, original_language="ja", year=None, content_rating="safe", image_url=None):
+        self.title = title
+        self.description = description
+        self.original_language = original_language
+        self.year = year
+        self.content_rating = content_rating
+        self.image_url = image_url
 
 
-class Manga(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    title = db.Column(db.String(200), nullable=False)
-    description = db.Column(db.Text, nullable=True)
-    original_language = db.Column(db.String(10), nullable=True, default="ja")
-    year = db.Column(db.String(4), nullable=True)
-    content_rating = db.Column(db.String(50), nullable=True)
-    image_url = db.Column(db.String(300), nullable=True)
-    # Para el usuario
-    user_rating = db.Column(db.Float, nullable=True)  # Valoración del usuario
-    # Descripción personalizada
-    user_description = db.Column(db.Text, nullable=True)
-    status = db.Column(db.String(20), nullable=True)  # Estado
+class Game:
+    def __init__(self, title, released=None, rating=None, image_url=None):
+        self.title = title
+        self.released = released
+        self.rating = rating
+        self.image_url = image_url
 
 
-class Game(db.Model):
-    id = db.Column(db.Integer, primary_key=True)  # ID de RAWG
-    title = db.Column(db.String(200), nullable=False)
-    released = db.Column(db.String(20), nullable=True)
-    rating = db.Column(db.Float, nullable=True)
-    image_url = db.Column(db.String(300), nullable=True)
-    # Para el usuario
-    user_rating = db.Column(db.Float, nullable=True)  # Valoración del usuario
-    # Descripción personalizada
-    user_description = db.Column(db.Text, nullable=True)
-    status = db.Column(db.String(20), nullable=True)  # Estado
-
-    def __repr__(self):
-        return f"<Manga {self.title}>"
-
-
-class Transaction(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    transaction_type = db.Column(db.String(10))  # "ingreso" o "gasto"
-    category = db.Column(db.String(50))         # categoría según lo que elijas
-    amount = db.Column(db.Float)
-    date = db.Column(db.DateTime, default=datetime.utcnow)
-
-    def __repr__(self):
-        return f"<Transaction {self.id} {self.transaction_type} {self.amount}>"
+class Transaction:
+    def __init__(self, transaction_type, category, amount, date):
+        self.transaction_type = transaction_type
+        self.category = category
+        self.amount = amount
+        self.date = date
