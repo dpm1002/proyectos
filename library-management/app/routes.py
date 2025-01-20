@@ -1,7 +1,6 @@
-from flask import Blueprint, render_template, request, redirect, url_for, session
+from flask import Blueprint, render_template, request, redirect, url_for, session, current_app, jsonify
 import requests
 from datetime import datetime
-from firebase_admin import firestore
 import os
 
 bp = Blueprint('routes', __name__)
@@ -26,7 +25,8 @@ def index():
 
 @bp.route("/library")
 def library():
-    db = get_firestore_db()
+    db = current_app.firestore_db
+
     books = [doc.to_dict() for doc in db.collection('books').stream()]
     mangas = [doc.to_dict() for doc in db.collection('mangas').stream()]
     games = [doc.to_dict() for doc in db.collection('games').stream()]
@@ -36,7 +36,7 @@ def library():
 
 @bp.route("/add_book", methods=["POST"])
 def add_book():
-    db = get_firestore_db()
+    db = current_app.firestore_db
     book_data = request.form
 
     book_ref = db.collection('books').document()
@@ -52,17 +52,13 @@ def add_book():
     return redirect(url_for("routes.library"))
 
 
-@bp.route("/book/<book_id>")
-def book_details(book_id):
-    db = get_firestore_db()
-    book = db.collection('books').document(book_id).get().to_dict()
-    return render_template("book_details.html", book=book)
-
-
 @bp.route("/book/<book_id>/update", methods=["POST"])
 def update_book(book_id):
-    db = get_firestore_db()
-    book_data = request.form
+    db = current_app.firestore_db
+    if request.is_json:
+        book_data = request.json
+    else:
+        book_data = request.form
 
     db.collection('books').document(book_id).update({
         'user_rating': float(book_data.get("user_rating", 0)),
@@ -70,12 +66,42 @@ def update_book(book_id):
         'status': book_data.get("status")
     })
 
+    if request.is_json:
+        return jsonify({"success": True}), 200
     return redirect(url_for("routes.book_details", book_id=book_id))
+
+
+@bp.route("/book/<string:book_id>", methods=["GET", "POST"])
+def book_details(book_id):
+    db = current_app.firestore_db
+
+    if request.method == "POST":
+        user_rating = request.form.get("user_rating")
+        user_description = request.form.get("user_description")
+        status = request.form.get("status")
+        genres = request.form.get("genres")
+
+        db.collection('books').document(book_id).update({
+            'user_rating': float(user_rating) if user_rating else None,
+            'user_description': user_description,
+            'status': status,
+            'genres': genres
+        })
+
+        return redirect(url_for("routes.book_details", book_id=book_id))
+
+    book_doc = db.collection('books').document(book_id).get()
+    if not book_doc.exists:
+        return f"El libro con ID {book_id} no existe.", 404
+
+    book = book_doc.to_dict()
+    book['id'] = book_id
+    return render_template("book_details.html", book=book)
 
 
 @bp.route("/add_manga", methods=["POST"])
 def add_manga():
-    db = get_firestore_db()
+    db = current_app.firestore_db
     manga_data = request.form
 
     manga_ref = db.collection('mangas').document()
@@ -354,14 +380,16 @@ def search_manga(query):
         return []
 
 
-@bp.route("/libros")
+@bp.route("/libros", methods=["GET"])
 def libros():
-    return render_template("libros.html")
+    db = current_app.firestore_db
+    books = [doc.to_dict() for doc in db.collection('books').stream()]
+    return render_template("libros.html", books=books)
 
 
 @bp.route("/finanzas", methods=["GET", "POST"])
 def finanzas():
-    db = get_firestore_db()
+    db = current_app.firestore_db
 
     if request.method == "POST":
         transaction_type = request.form.get("transaction_type")
@@ -384,7 +412,7 @@ def finanzas():
 
 @bp.route("/finanzas/grafico")
 def finanzas_grafico():
-    db = get_firestore_db()
+    db = current_app.firestore_db
 
     transactions = [doc.to_dict()
                     for doc in db.collection('transactions').stream()]
@@ -395,6 +423,23 @@ def finanzas_grafico():
     balance = total_ingresos - total_gastos
 
     return render_template("finanzas_grafico.html", total_ingresos=total_ingresos, total_gastos=total_gastos, balance=balance)
+
+
+@bp.route('/get-transactions', methods=['GET'])
+def get_transactions():
+    # Obtener Firestore desde current_app
+    db = current_app.firestore_db
+    transactions = []
+
+    try:
+        # Obtener todas las transacciones desde Firestore
+        docs = db.collection('transactions').get()
+        for doc in docs:
+            transactions.append(doc.to_dict())
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+    return jsonify(transactions), 200
 
 
 @bp.route("/manga")

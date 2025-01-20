@@ -11,9 +11,7 @@
         <div class="col-md-4">
             <div class="card mb-4">
                 <a href="{{ url_for('routes.book_details', book_id=book.id) }}" target="_blank">
-                    <img 
-                        src="{{ book.image_url if book.image_url else '/static/no_image.png' }}" 
-                        class="card-img-top" 
+                    <img src="{{ book.image_url if book.image_url else '/static/no_image.png' }}" class="card-img-top"
                         alt="{{ book.title }}">
                 </a>
                 <div class="card-body">
@@ -33,9 +31,7 @@
         <div class="col-md-4">
             <div class="card mb-4">
                 <a href="{{ url_for('routes.manga_details', manga_id=manga.id) }}" target="_blank">
-                    <img 
-                        src="{{ manga.image_url if manga.image_url else '/static/no_image.png' }}" 
-                        class="card-img-top" 
+                    <img src="{{ manga.image_url if manga.image_url else '/static/no_image.png' }}" class="card-img-top"
                         alt="{{ manga.title }}">
                 </a>
                 <div class="card-body">
@@ -47,21 +43,20 @@
         </div>
         {% endfor %}
     </div>
-    
+
     <!-- Sección de Videojuegos -->
     <h2>Videojuegos Guardados</h2>
     <div class="row">
         {% for game in games %}
         <div class="col-md-4">
             <div class="card mb-4">
-                <img 
-                    src="{{ game.image_url if game.image_url else '/static/no_image.png' }}" 
-                    class="card-img-top" 
+                <img src="{{ game.image_url if game.image_url else '/static/no_image.png' }}" class="card-img-top"
                     alt="{{ game.title }}">
                 <div class="card-body">
                     <h5 class="card-title">{{ game.title }}</h5>
                     <p class="card-text">Calificación: {{ game.rating }}</p>
-                    <a href="{{ url_for('routes.game_details', game_id=game.id) }}" class="btn btn-primary">Ver Detalles</a>
+                    <a href="{{ url_for('routes.game_details', game_id=game.id) }}" class="btn btn-primary">Ver
+                        Detalles</a>
                 </div>
             </div>
         </div>

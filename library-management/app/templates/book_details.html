@@ -5,9 +5,7 @@
     <h1>{{ book.title }}</h1>
     <div class="row mt-4">
         <div class="col-md-4">
-            <img 
-                src="{{ book.image_url if book.image_url else '/static/no_image.png' }}" 
-                class="img-fluid" 
+            <img src="{{ book.image_url if book.image_url else '/static/no_image.png' }}" class="img-fluid"
                 alt="{{ book.title }}">
         </div>
         <div class="col-md-8">
@@ -20,48 +18,39 @@
             <h4>Tu Valoración</h4>
             <p><strong>Estado:</strong> {{ book.status if book.status else 'No especificado' }}</p>
             <p><strong>Tu valoración:</strong> {{ book.user_rating if book.user_rating else 'Sin valoración' }}</p>
-            <p><strong>Descripción Personal:</strong> {{ book.user_description if book.user_description else 'No proporcionada' }}</p>
+            <p><strong>Descripción Personal:</strong> {{ book.user_description if book.user_description else 'No
+                proporcionada' }}</p>
 
             <!-- Botón para actualizar los datos -->
             <h4>Actualizar Información Personal</h4>
             <form method="POST" action="{{ url_for('routes.update_book', book_id=book.id) }}">
                 <div class="mb-3">
                     <label for="user_rating" class="form-label">Valoración (0-10):</label>
-                    <input 
-                        type="number" 
-                        class="form-control" 
-                        id="user_rating" 
-                        name="user_rating" 
-                        min="0" 
-                        max="10" 
-                        step="0.1" 
-                        value="{{ book.user_rating }}">
+                    <input type="number" class="form-control" id="user_rating" name="user_rating" min="0" max="10"
+                        step="0.1" value="{{ book.user_rating }}">
                 </div>
                 <div class="mb-3">
                     <label for="user_description" class="form-label">Descripción Personal:</label>
-                    <textarea 
-                        class="form-control" 
-                        id="user_description" 
+                    <textarea class="form-control" id="user_description"
                         name="user_description">{{ book.user_description }}</textarea>
                 </div>
                 <div class="mb-3">
                     <label for="status" class="form-label">Estado:</label>
                     <select class="form-control" id="status" name="status">
-                        <option value="No vista" {% if book.status == "No vista" %}selected{% endif %}>No vista</option>
-                        <option value="Leyendo" {% if book.status == "Leyendo" %}selected{% endif %}>Leyendo</option>
-                        <option value="Terminada" {% if book.status == "Terminada" %}selected{% endif %}>Terminada</option>
-                        <option value="Planeada" {% if book.status == "Planeada" %}selected{% endif %}>Planeada</option>
+                        <option value="No vista" {% if book.status=="No vista" %}selected{% endif %}>No vista</option>
+                        <option value="Leyendo" {% if book.status=="Leyendo" %}selected{% endif %}>Leyendo</option>
+                        <option value="Terminada" {% if book.status=="Terminada" %}selected{% endif %}>Terminada
+                        </option>
+                        <option value="Planeada" {% if book.status=="Planeada" %}selected{% endif %}>Planeada</option>
                     </select>
                 </div>
-                <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                <button type="button" class="btn btn-primary" onclick="updateBook('{{ book.id }}')">Guardar
+                    Cambios</button>
+
             </form>
             <h4>Actualizar Géneros</h4>
             <form method="POST" action="{{ url_for('routes.update_book_genres', book_id=book.id) }}">
-                <input 
-                    type="text" 
-                    class="form-control" 
-                    name="genres" 
-                    value="{{ book.genres }}" 
+                <input type="text" class="form-control" name="genres" value="{{ book.genres }}"
                     placeholder="Ejemplo: Ficción, Fantasía, Aventura">
                 <button type="submit" class="btn btn-primary mt-3">Guardar</button>
             </form>
@@ -69,4 +58,28 @@
         </div>
     </div>
 </div>
+<script>
+    async function updateBook(bookId) {
+        const userRating = document.getElementById('user_rating').value;
+        const userDescription = document.getElementById('user_description').value;
+        const status = document.getElementById('status').value;
+
+        const response = await fetch(`/book/${bookId}/update`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                user_rating: userRating,
+                user_description: userDescription,
+                status: status
+            })
+        });
+
+        if (response.ok) {
+            alert("Libro actualizado correctamente");
+        } else {
+            alert("Error al actualizar el libro");
+        }
+    }
+</script>
+
 {% endblock %}
