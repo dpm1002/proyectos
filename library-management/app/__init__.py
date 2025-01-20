@@ -7,7 +7,7 @@ def create_app():
     app = Flask(__name__)
 
     # Configuración de Firebase
-    cred = credentials.Certificate('./.gitignore/credenciales.json')
+    cred = credentials.Certificate('./credentials/credenciales.json')
     firebase_admin.initialize_app(cred)
     app.firestore_db = firestore.client()
 
