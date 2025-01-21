@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Ejercicios</title>
+</head>
+
+<body>
+    <h1>Lista de Ejercicios</h1>
+    <ul>
+        {% for exercise in exercises %}
+        <li>{{ exercise['name'] }} - {{ exercise['bodyPart'] }}</li>
+        {% endfor %}
+    </ul>
+    <a href="/buscar_ejercicio">Buscar Ejercicio</a>
+</body>
+
+</html>

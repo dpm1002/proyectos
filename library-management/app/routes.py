@@ -2,9 +2,12 @@ from flask import Blueprint, render_template, request, redirect, url_for, sessio
 import requests
 from datetime import datetime
 import os
+from dotenv import load_dotenv
 
 bp = Blueprint('routes', __name__)
 
+# Cargar las variables del archivo .env
+load_dotenv()
 
 SPOTIFY_CLIENT_ID = os.getenv("SPOTIFY_CLIENT_ID")
 SPOTIFY_CLIENT_SECRET = os.getenv("SPOTIFY_CLIENT_SECRET")
@@ -12,6 +15,9 @@ SPOTIFY_REDIRECT_URI = os.getenv("SPOTIFY_REDIRECT_URI")
 SPOTIFY_AUTH_URL = "https://accounts.spotify.com/authorize"
 SPOTIFY_TOKEN_URL = "https://accounts.spotify.com/api/token"
 SPOTIFY_API_URL = "https://api.spotify.com/v1"
+
+EXERCISE_API_URL = os.getenv("EXERCISE_API_URL")
+EXERCISE_HEADERS = eval(os.getenv("EXERCISE_HEADERS"))
 
 
 def get_firestore_db():
@@ -441,6 +447,47 @@ def get_transactions():
         return jsonify({"error": str(e)}), 500
 
     return jsonify(transactions), 200
+
+
+@bp.route("/buscar_ejercicio", methods=["GET", "POST"])
+def buscar_ejercicio():
+    ejercicios = []
+    if request.method == "POST":
+        termino_busqueda = request.form["termino"]
+        termino_busqueda = termino_busqueda.lower()  # Convertir a minúsculas
+        url = f"https://exercisedb.p.rapidapi.com/exercises/name/{termino_busqueda}"
+        headers = EXERCISE_HEADERS
+
+        response = requests.get(url, headers=headers)
+
+        # Depuración
+        print(f"Término buscado: {termino_busqueda}")
+        print(f"Estado de respuesta: {response.status_code}")
+        print(f"Respuesta de la API: {response.json()}")
+
+        if response.status_code == 200:
+            ejercicios = response.json()
+        else:
+            ejercicios = []  # Si hay un error, vaciar lista
+
+    return render_template("buscar_ejercicio.html", ejercicios=ejercicios)
+
+
+@bp.route("/resultado_ejercicio/<termino>")
+def resultado_ejercicio(termino):
+    """Mostrar detalles de un ejercicio"""
+    response = requests.get(
+        f"{EXERCISE_API_URL}/search/{termino}", headers=EXERCISE_HEADERS)
+    exercises = response.json() if response.status_code == 200 else []
+    return render_template("resultado_ejercicio.html", exercises=exercises)
+
+
+@bp.route("/ejercicios")
+def ejercicios():
+    """Pantalla principal que muestra una lista de ejercicios"""
+    response = requests.get(EXERCISE_API_URL, headers=EXERCISE_HEADERS)
+    exercises = response.json() if response.status_code == 200 else []
+    return render_template("ejercicios.html", exercises=exercises)
 
 
 @bp.route("/manga")

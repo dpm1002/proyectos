@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Resultado Ejercicio</title>
+</head>
+
+<body>
+    <h1>Detalles del Ejercicio</h1>
+    {% for exercise in exercises %}
+    <h2>{{ exercise['name'] }}</h2>
+    <p><strong>Músculo:</strong> {{ exercise['target'] }}</p>
+    <p><strong>Equipo:</strong> {{ exercise['equipment'] }}</p>
+    <p><strong>Parte del cuerpo:</strong> {{ exercise['bodyPart'] }}</p>
+    {% endfor %}
+    <a href="/ejercicios">Volver</a>
+</body>
+
+</html>
