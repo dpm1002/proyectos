@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -13,15 +14,18 @@
             color: white;
             font-family: Arial, sans-serif;
         }
+
         .playlist-image {
             width: 100%;
             height: 150px;
             object-fit: cover;
             border-radius: 10px;
         }
+
         .player-controls button {
             margin: 0 5px;
         }
+
         .device-item {
             cursor: pointer;
             padding: 10px;
@@ -31,14 +35,17 @@
             justify-content: space-between;
             align-items: center;
         }
+
         .device-item.active {
             background-color: #1db954;
             color: white;
         }
+
         #status {
             font-size: 0.9rem;
             color: #bbbbbb;
         }
+
         #current-track img {
             width: 50px;
             height: 50px;
@@ -46,22 +53,27 @@
             margin-right: 10px;
             cursor: pointer;
         }
+
         .search-result img {
             width: 50px;
             height: 50px;
             margin-right: 10px;
             border-radius: 5px;
         }
+
         .modal-content {
-            color: black; /* Texto en negro */
+            color: black;
+            /* Texto en negro */
         }
 
         /* Asegurarse de que los títulos y enlaces en el modal también sean negros */
-        .modal-title, #song-details a {
+        .modal-title,
+        #song-details a {
             color: black;
         }
     </style>
 </head>
+
 <body>
     <div class="container py-4">
         <h1 class="text-center mb-4">Spotify Web Playback SDK</h1>
@@ -69,24 +81,24 @@
         <!-- Perfil del usuario -->
         <div class="text-center mb-4">
             {% if profile %}
-                <p><strong>Usuario:</strong> {{ profile.display_name }}</p>
-                <p>
-                    <strong>Perfil de Spotify:</strong>
-                    {% if profile.external_urls and profile.external_urls.spotify %}
-                        <a href="{{ profile.external_urls.spotify }}" target="_blank" class="btn btn-success btn-sm">
-                            Ver perfil
-                        </a>
-                    {% else %}
-                        No disponible
-                    {% endif %}
-                    
-                    <strong>Estadisticas de Spotify:</strong>
-                        <button class="btn btn-primary mt-4" onclick="window.location.href='/spotify/stats'">
-                            Ver mis estadísticas
-                        </button>
-                </p>
+            <p><strong>Usuario:</strong> {{ profile.display_name }}</p>
+            <p>
+                <strong>Perfil de Spotify:</strong>
+                {% if profile.external_urls and profile.external_urls.spotify %}
+                <a href="{{ profile.external_urls.spotify }}" target="_blank" class="btn btn-success btn-sm">
+                    Ver perfil
+                </a>
+                {% else %}
+                No disponible
+                {% endif %}
+
+                <strong>Estadisticas de Spotify:</strong>
+                <button class="btn btn-primary mt-4" onclick="window.location.href='/spotify/stats'">
+                    Ver mis estadísticas
+                </button>
+            </p>
             {% else %}
-                <p>No se pudo cargar la información del perfil.</p>
+            <p>No se pudo cargar la informacion del perfil.</p>
             {% endif %}
         </div>
 
@@ -125,7 +137,8 @@
         </div>
 
         <!-- Modal para mostrar detalles de la canción -->
-        <div class="modal fade" id="songInfoModal" tabindex="-1" aria-labelledby="songInfoModalLabel" aria-hidden="true">
+        <div class="modal fade" id="songInfoModal" tabindex="-1" aria-labelledby="songInfoModalLabel"
+            aria-hidden="true">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
@@ -139,9 +152,12 @@
                             <p><strong>Artista:</strong> <span id="modal-track-artist"></span></p>
                             <p><strong>Álbum:</strong> <span id="modal-track-album"></span></p>
                             <p><strong>Duración:</strong> <span id="modal-track-duration"></span></p>
-                            <p><strong>Popularidad:</strong> <span id="modal-track-popularity"></span></p> <!-- Nuevo campo -->
-                            <p><strong>Explícito:</strong> <span id="modal-track-explicit"></span></p> <!-- Nuevo campo -->
-                            <a href="#" target="_blank" id="modal-track-link" class="btn btn-success">Abrir en Spotify</a>
+                            <p><strong>Popularidad:</strong> <span id="modal-track-popularity"></span></p>
+                            <!-- Nuevo campo -->
+                            <p><strong>Explícito:</strong> <span id="modal-track-explicit"></span></p>
+                            <!-- Nuevo campo -->
+                            <a href="#" target="_blank" id="modal-track-link" class="btn btn-success">Abrir en
+                                Spotify</a>
                         </div>
                     </div>
                 </div>
@@ -152,7 +168,8 @@
         <div class="search mt-5">
             <h4>Buscar Canciones</h4>
             <form id="search-form" class="mb-3">
-                <input type="text" id="search-query" class="form-control" placeholder="Introduce el nombre de la canción o artista">
+                <input type="text" id="search-query" class="form-control"
+                    placeholder="Introduce el nombre de la canción o artista">
                 <button type="submit" class="btn btn-primary mt-3">Buscar</button>
             </form>
             <div id="search-results" class="list-group"></div>
@@ -310,4 +327,5 @@
         };
     </script>
 </body>
+
 </html>
