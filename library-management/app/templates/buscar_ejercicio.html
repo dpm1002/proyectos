@@ -6,7 +6,8 @@
 <div class="container mt-4">
     <form method="POST" action="{{ url_for('routes.buscar_ejercicio') }}">
         <div class="input-group mb-3">
-            <input type="text" class="form-control" name="termino" placeholder="Buscar ejercicio por nombre o músculo">
+            <input type="text" class="form-control" name="termino" placeholder="Buscar ejercicio por nombre o músculo"
+                value="{{ termino or '' }}">
             <button class="btn btn-primary" type="submit">Buscar</button>
         </div>
     </form>

@@ -453,25 +453,32 @@ def get_transactions():
 @bp.route("/buscar_ejercicio", methods=["GET", "POST"])
 def buscar_ejercicio():
     ejercicios = []
+    termino_busqueda = None
+
+    # Si la solicitud es POST, redirigir a la misma ruta con el término como parámetro
     if request.method == "POST":
-        termino_busqueda = request.form["termino"]
-        termino_busqueda = termino_busqueda.lower()  # Convertir a minúsculas
+        termino_busqueda = request.form.get("termino", "").strip().lower()
+        return redirect(url_for("routes.buscar_ejercicio", termino=termino_busqueda))
+
+    # Si el término ya está en la URL, realizar la búsqueda
+    termino_busqueda = request.args.get("termino", "").strip().lower()
+    if termino_busqueda:
         url = f"https://exercisedb.p.rapidapi.com/exercises/name/{termino_busqueda}"
         headers = EXERCISE_HEADERS
 
         response = requests.get(url, headers=headers)
-
-        # Depuración
-        print(f"Término buscado: {termino_busqueda}")
-        print(f"Estado de respuesta: {response.status_code}")
-        print(f"Respuesta de la API: {response.json()}")
 
         if response.status_code == 200:
             ejercicios = response.json()
         else:
             ejercicios = []  # Si hay un error, vaciar lista
 
-    return render_template("buscar_ejercicio.html", ejercicios=ejercicios)
+        # Depuración
+        print(f"Término buscado: {termino_busqueda}")
+        print(f"Estado de respuesta: {response.status_code}")
+        print(f"Respuesta de la API: {response.json()}")
+
+    return render_template("buscar_ejercicio.html", ejercicios=ejercicios, termino=termino_busqueda)
 
 
 @bp.route("/resultado_ejercicio/<termino>")
@@ -551,6 +558,7 @@ def ejercicios():
 
     return render_template("ejercicios.html", listas=listas)
 
+
 @bp.route("/ejercicio/<string:ejercicio_id>")
 def ejercicio_detalle(ejercicio_id):
     url = f"{EXERCISE_API_URL}/exercise/{ejercicio_id}"
@@ -559,7 +567,8 @@ def ejercicio_detalle(ejercicio_id):
     if response.status_code == 200:
         ejercicio = response.json()
     else:
-        ejercicio = {"error": "No se pudo obtener la información del ejercicio."}
+        ejercicio = {
+            "error": "No se pudo obtener la información del ejercicio."}
 
     return render_template("ejercicio_detalle.html", ejercicio=ejercicio)
 
