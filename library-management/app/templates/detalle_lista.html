@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1 class="text-center">Lista: {{ lista }}</h1>
+
+<div class="container mt-4">
+    {% if ejercicios %}
+    <ul class="list-group">
+        {% for ejercicio in ejercicios %}
+        <li class="list-group-item">
+            <h5>{{ ejercicio.name }}</h5>
+            <p><strong>Músculo principal:</strong> {{ ejercicio.target }}</p>
+            <p><strong>Equipo:</strong> {{ ejercicio.equipment }}</p>
+            <img src="{{ ejercicio.gifUrl }}" alt="Imagen del ejercicio" class="img-fluid">
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p>No hay ejercicios en esta lista.</p>
+    {% endif %}
+</div>
+
+<div class="mt-4">
+    <a href="{{ url_for('routes.ejercicios') }}" class="btn btn-secondary">Volver</a>
+</div>
+{% endblock %}

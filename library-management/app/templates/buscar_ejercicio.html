@@ -1,56 +1,38 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Buscar Ejercicio</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-        }
+{% block content %}
+<h1 class="text-center">Buscar Ejercicio</h1>
 
-        .exercise {
-            border: 1px solid #ccc;
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 5px;
-        }
-
-        .exercise img {
-            max-width: 100%;
-            height: auto;
-        }
-    </style>
-</head>
-
-<body>
-    <h1>Buscar Ejercicio</h1>
-    <form action="/buscar_ejercicio" method="POST">
-        <label for="termino">Nombre o músculo</label>
-        <input type="text" id="termino" name="termino" placeholder="Ejemplo: biceps" required>
-        <button type="submit">Buscar</button>
+<div class="container mt-4">
+    <form method="POST" action="{{ url_for('routes.buscar_ejercicio') }}">
+        <div class="input-group mb-3">
+            <input type="text" class="form-control" name="termino" placeholder="Buscar ejercicio por nombre o músculo">
+            <button class="btn btn-primary" type="submit">Buscar</button>
+        </div>
     </form>
+</div>
 
-    {% if ejercicios %}
-    <h2>Resultados de búsqueda</h2>
-    {% for ejercicio in ejercicios %}
-    <div class="exercise">
-        <h3>{{ ejercicio['name'] }}</h3>
-        <img src="{{ ejercicio['gifUrl'] }}" alt="Gif del ejercicio">
-        <p><strong>Músculo principal:</strong> {{ ejercicio['target'] }}</p>
-        <p><strong>Equipo necesario:</strong> {{ ejercicio['equipment'] }}</p>
-        <p><strong>Instrucciones:</strong></p>
-        <ol>
-            {% for step in ejercicio['instructions'] %}
-            <li>{{ step }}</li>
-            {% endfor %}
-        </ol>
-    </div>
-    {% endfor %}
-    {% else %}
-    <p>No se encontraron ejercicios para tu búsqueda.</p>
-    {% endif %}
-</body>
-
-</html>
+{% if ejercicios %}
+<div class="container mt-4">
+    <h2>Resultados de la búsqueda</h2>
+    <ul class="list-group">
+        {% for ejercicio in ejercicios %}
+        <li class="list-group-item">
+            <h5>{{ ejercicio.name }}</h5>
+            <p><strong>Músculo:</strong> {{ ejercicio.target }}</p>
+            <p><strong>Equipo:</strong> {{ ejercicio.equipment }}</p>
+            <img src="{{ ejercicio.gifUrl }}" alt="Imagen del ejercicio" class="img-fluid">
+            <form method="POST" action="{{ url_for('routes.agregar_ejercicio') }}">
+                <input type="hidden" name="ejercicio_id" value="{{ ejercicio.id }}">
+                <input type="hidden" name="nombre_ejercicio" value="{{ ejercicio.name }}">
+                <div class="input-group mt-2">
+                    <input type="text" class="form-control" name="lista" placeholder="Nombre de la lista">
+                    <button class="btn btn-success" type="submit">Añadir a lista</button>
+                </div>
+            </form>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+{% endblock %}

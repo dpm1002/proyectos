@@ -3,6 +3,7 @@ import requests
 from datetime import datetime
 import os
 from dotenv import load_dotenv
+from google.cloud import firestore
 
 bp = Blueprint('routes', __name__)
 
@@ -482,12 +483,73 @@ def resultado_ejercicio(termino):
     return render_template("resultado_ejercicio.html", exercises=exercises)
 
 
-@bp.route("/ejercicios")
+@bp.route("/guardar_ejercicio", methods=["POST"])
+def guardar_ejercicio():
+    db = get_firestore_db()
+    ejercicio_data = request.form
+
+    # Extraer datos del formulario
+    ejercicio = {
+        "id": ejercicio_data.get("id"),
+        "name": ejercicio_data.get("name"),
+        "bodyPart": ejercicio_data.get("bodyPart"),
+        "equipment": ejercicio_data.get("equipment"),
+        "gifUrl": ejercicio_data.get("gifUrl"),
+    }
+    lista = ejercicio_data.get("lista", "Default")
+
+    # Guardar en Firebase
+    db.collection("listas").document(lista).set(
+        {"ejercicios": firestore.ArrayUnion([ejercicio])}, merge=True
+    )
+
+    return jsonify({"message": f"Ejercicio '{ejercicio['name']}' guardado en la lista '{lista}'"}), 200
+
+
+@bp.route("/ver_lista/<string:lista>")
+def ver_lista(lista):
+    """Ver los ejercicios de una lista específica."""
+    db = get_firestore_db()
+    lista_doc = db.collection("listas").document(lista).get()
+
+    if not lista_doc.exists:
+        return f"La lista '{lista}' no existe.", 404
+
+    ejercicios = lista_doc.to_dict().get("ejercicios", [])
+    return render_template("lista.html", lista=lista, ejercicios=ejercicios)
+
+
+@bp.route("/agregar_ejercicio", methods=["POST"])
+def agregar_ejercicio():
+    db = get_firestore_db()
+    lista = request.form.get("lista")
+    ejercicio_id = request.form.get("ejercicio_id")
+    nombre_ejercicio = request.form.get("nombre_ejercicio")
+
+    # Agregar ejercicio a la lista
+    db.collection("listas").document(lista).set(
+        {"ejercicios": firestore.ArrayUnion(
+            [{"id": ejercicio_id, "name": nombre_ejercicio}])},
+        merge=True,
+    )
+
+    return redirect(url_for("routes.ejercicios"))
+
+
+@bp.route("/ejercicios", methods=["GET"])
 def ejercicios():
-    """Pantalla principal que muestra una lista de ejercicios"""
-    response = requests.get(EXERCISE_API_URL, headers=EXERCISE_HEADERS)
-    exercises = response.json() if response.status_code == 200 else []
-    return render_template("ejercicios.html", exercises=exercises)
+    db = get_firestore_db()
+    listas_ref = db.collection("listas").stream()
+
+    listas = []
+    for lista in listas_ref:
+        data = lista.to_dict()
+        listas.append({
+            "nombre": lista.id,
+            "ejercicios": data.get("ejercicios", [])
+        })
+
+    return render_template("ejercicios.html", listas=listas)
 
 
 @bp.route("/manga")

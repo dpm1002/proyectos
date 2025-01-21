@@ -1,18 +1,47 @@
-<!DOCTYPE html>
-<html>
+{% extends "base.html" %}
 
-<head>
-    <title>Ejercicios</title>
-</head>
+{% block content %}
+<h1 class="text-center mt-4">Ejercicios Guardados</h1>
 
-<body>
-    <h1>Lista de Ejercicios</h1>
-    <ul>
-        {% for exercise in exercises %}
-        <li>{{ exercise['name'] }} - {{ exercise['bodyPart'] }}</li>
-        {% endfor %}
-    </ul>
-    <a href="/buscar_ejercicio">Buscar Ejercicio</a>
-</body>
+<form method="GET" action="{{ url_for('routes.buscar_ejercicio') }}">
+    <div class="form-group">
+        <input type="text" class="form-control" name="termino" placeholder="Buscar ejercicio por nombre o músculo">
+    </div>
+    <button type="submit" class="btn btn-primary mt-2">Buscar</button>
+</form>
 
-</html>
+<h2 class="mt-5">Listas Guardadas</h2>
+{% if listas %}
+<div class="accordion" id="listasAccordion">
+    {% for lista in listas %}
+    <div class="accordion-item">
+        <h2 class="accordion-header" id="heading{{ loop.index }}">
+            <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse"
+                data-bs-target="#collapse{{ loop.index }}" aria-expanded="false"
+                aria-controls="collapse{{ loop.index }}">
+                {{ lista.nombre }}
+            </button>
+        </h2>
+        <div id="collapse{{ loop.index }}" class="accordion-collapse collapse" aria-labelledby="heading{{ loop.index }}"
+            data-bs-parent="#listasAccordion">
+            <div class="accordion-body">
+                {% if lista.ejercicios %}
+                <ul class="list-group">
+                    {% for ejercicio in lista.ejercicios %}
+                    <li class="list-group-item">
+                        <strong>{{ ejercicio.name }}</strong>
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <p>No hay ejercicios guardados en esta lista.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<p>No hay listas guardadas.</p>
+{% endif %}
+{% endblock %}
