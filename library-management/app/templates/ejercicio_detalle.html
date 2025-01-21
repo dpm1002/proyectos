@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    {% if ejercicio.error %}
+    <h2 class="text-danger">Error</h2>
+    <p>{{ ejercicio.error }}</p>
+    {% else %}
+    <h1 class="text-center">{{ ejercicio.name }}</h1>
+    <p><strong>Músculo objetivo:</strong> {{ ejercicio.target }}</p>
+    <p><strong>Equipo necesario:</strong> {{ ejercicio.equipment }}</p>
+    <p><strong>Parte del cuerpo:</strong> {{ ejercicio.bodyPart }}</p>
+    <h3>Instrucciones</h3>
+    <ul>
+        {% for step in ejercicio.instructions %}
+        <li>{{ step }}</li>
+        {% endfor %}
+    </ul>
+    <div class="text-center">
+        <img src="{{ ejercicio.gifUrl }}" alt="{{ ejercicio.name }}" class="img-fluid">
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

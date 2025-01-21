@@ -29,7 +29,9 @@
                 <ul class="list-group">
                     {% for ejercicio in lista.ejercicios %}
                     <li class="list-group-item">
-                        <strong>{{ ejercicio.name }}</strong>
+                        <a href="{{ url_for('routes.ejercicio_detalle', ejercicio_id=ejercicio.id) }}">
+                            <strong>{{ ejercicio.name }}</strong>
+                        </a>
                     </li>
                     {% endfor %}
                 </ul>

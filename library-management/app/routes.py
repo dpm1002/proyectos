@@ -551,6 +551,18 @@ def ejercicios():
 
     return render_template("ejercicios.html", listas=listas)
 
+@bp.route("/ejercicio/<string:ejercicio_id>")
+def ejercicio_detalle(ejercicio_id):
+    url = f"{EXERCISE_API_URL}/exercise/{ejercicio_id}"
+    response = requests.get(url, headers=EXERCISE_HEADERS)
+
+    if response.status_code == 200:
+        ejercicio = response.json()
+    else:
+        ejercicio = {"error": "No se pudo obtener la información del ejercicio."}
+
+    return render_template("ejercicio_detalle.html", ejercicio=ejercicio)
+
 
 @bp.route("/manga")
 def manga():
