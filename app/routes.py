@@ -19,6 +19,7 @@ SPOTIFY_API_URL = "https://api.spotify.com/v1"
 
 EXERCISE_API_URL = os.getenv("EXERCISE_API_URL")
 EXERCISE_HEADERS = eval(os.getenv("EXERCISE_HEADERS"))
+RAWG_API = os.getenv("RAWG_API")
 
 
 def get_firestore_db():
@@ -304,7 +305,7 @@ def user_stats():
 def search_game():
     if request.method == "POST":
         query = request.form.get("query")
-        api_key = "9422c4d6ee1c4a90b9e87e170f5f2aac"
+        api_key = RAWG_API
         url = f"https://api.rawg.io/api/games"
         params = {
             "key": api_key,
