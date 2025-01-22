@@ -1,2 +1,5 @@
 # Credenciales
 ./credentials/credenciales.json
+
+#Credenciales spotify
+.env
