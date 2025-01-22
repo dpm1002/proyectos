@@ -14,3 +14,6 @@ __pycache__/
 .vscode/
 .idea/
 Thumbs.db
+
+# Credenciales
+./library-management/credentials/credenciales.json
