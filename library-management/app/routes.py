@@ -104,7 +104,7 @@ def book_details(book_id):
 
     book = book_doc.to_dict()
     book['id'] = book_id
-    return render_template("book_details.html", book=book)
+    return render_template("libros/book_details.html", book=book)
 
 
 @bp.route("/add_manga", methods=["POST"])
@@ -129,7 +129,7 @@ def add_manga():
 def manga_details(manga_id):
     db = get_firestore_db()
     manga = db.collection('mangas').document(manga_id).get().to_dict()
-    return render_template("manga_details.html", manga=manga)
+    return render_template("manga/manga_details.html", manga=manga)
 
 
 @bp.route("/manga/<manga_id>/update", methods=["POST"])
@@ -166,7 +166,7 @@ def add_game():
 def game_details(game_id):
     db = get_firestore_db()
     game = db.collection('games').document(game_id).get().to_dict()
-    return render_template("game_details.html", game=game)
+    return render_template("games/game_details.html", game=game)
 
 
 @bp.route("/game/<game_id>/update", methods=["POST"])
@@ -233,7 +233,7 @@ def spotify_player():
     if not playlists_data:
         return "No se encontraron listas de reproducción. Por favor, verifica tu cuenta de Spotify.", 500
 
-    return render_template("spotify_player.html", profile=profile_data, playlists=playlists_data, access_token=access_token)
+    return render_template("spotify/spotify_player.html", profile=profile_data, playlists=playlists_data, access_token=access_token)
 
 
 @bp.route("/spotify/stats")
@@ -297,7 +297,7 @@ def user_stats():
             if track_response.status_code == 200:
                 detailed_tracks_by_month[month].append(track_response.json())
 
-    return render_template("spotify_stats.html", tracks_by_month=detailed_tracks_by_month)
+    return render_template("spotify/spotify_stats.html", tracks_by_month=detailed_tracks_by_month)
 
 
 @bp.route("/search_game", methods=["GET", "POST"])
@@ -315,10 +315,10 @@ def search_game():
         response = requests.get(url, params=params)
         if response.status_code == 200:
             games = response.json().get("results", [])
-            return render_template("game_results.html", games=games)
+            return render_template("games/game_results.html", games=games)
         else:
             return f"Error al conectar con la API de RAWG: {response.status_code}", 500
-    return render_template("game_search.html")
+    return render_template("games/game_search.html")
 
 
 @bp.route("/searchBOOK", methods=["POST"])
@@ -343,7 +343,7 @@ def searchBook():
         response = requests.get(url)
         response.raise_for_status()
         books = response.json().get("items", [])
-        return render_template("results.html", books=books)
+        return render_template("libros/results.html", books=books)
     except requests.exceptions.RequestException as e:
         print(f"Error al conectar con la API de Google Books: {e}")
         return f"Error al conectar con la API de Google Books: {e}", 500
@@ -353,7 +353,7 @@ def searchBook():
 def searchManga():
     query = request.form.get("query")
     results = search_manga(query)
-    return render_template("manga_results.html", mangas=results)
+    return render_template("manga/manga_results.html", mangas=results)
 
 
 def search_manga(query):
@@ -392,7 +392,17 @@ def search_manga(query):
 def libros():
     db = current_app.firestore_db
     books = [doc.to_dict() for doc in db.collection('books').stream()]
-    return render_template("libros.html", books=books)
+    return render_template("libros/libros.html", books=books)
+
+
+@bp.route("/manga")
+def manga():
+    return render_template("manga/manga.html")
+
+
+@bp.route("/games")
+def games():
+    return render_template("games/games.html")
 
 
 @bp.route("/finanzas", methods=["GET", "POST"])
@@ -415,7 +425,7 @@ def finanzas():
 
     transactions = [doc.to_dict()
                     for doc in db.collection('transactions').stream()]
-    return render_template("finanzas.html", transactions=transactions)
+    return render_template("finanzas/finanzas.html", transactions=transactions)
 
 
 @bp.route("/finanzas/grafico")
@@ -430,7 +440,7 @@ def finanzas_grafico():
                        for t in transactions if t['transaction_type'] == "gasto")
     balance = total_ingresos - total_gastos
 
-    return render_template("finanzas_grafico.html", total_ingresos=total_ingresos, total_gastos=total_gastos, balance=balance)
+    return render_template("finanzas/finanzas_grafico.html", total_ingresos=total_ingresos, total_gastos=total_gastos, balance=balance)
 
 
 @bp.route('/get-transactions', methods=['GET'])
@@ -478,7 +488,7 @@ def buscar_ejercicio():
         print(f"Estado de respuesta: {response.status_code}")
         print(f"Respuesta de la API: {response.json()}")
 
-    return render_template("buscar_ejercicio.html", ejercicios=ejercicios, termino=termino_busqueda)
+    return render_template("ejercicio/buscar_ejercicio.html", ejercicios=ejercicios, termino=termino_busqueda)
 
 
 @bp.route("/resultado_ejercicio/<termino>")
@@ -487,7 +497,7 @@ def resultado_ejercicio(termino):
     response = requests.get(
         f"{EXERCISE_API_URL}/search/{termino}", headers=EXERCISE_HEADERS)
     exercises = response.json() if response.status_code == 200 else []
-    return render_template("resultado_ejercicio.html", exercises=exercises)
+    return render_template("ejercicio/resultado_ejercicio.html", exercises=exercises)
 
 
 @bp.route("/guardar_ejercicio", methods=["POST"])
@@ -523,7 +533,7 @@ def ver_lista(lista):
         return f"La lista '{lista}' no existe.", 404
 
     ejercicios = lista_doc.to_dict().get("ejercicios", [])
-    return render_template("lista.html", lista=lista, ejercicios=ejercicios)
+    return render_template("ejercicio/lista.html", lista=lista, ejercicios=ejercicios)
 
 
 @bp.route("/agregar_ejercicio", methods=["POST"])
@@ -556,7 +566,7 @@ def ejercicios():
             "ejercicios": data.get("ejercicios", [])
         })
 
-    return render_template("ejercicios.html", listas=listas)
+    return render_template("ejercicio/ejercicios.html", listas=listas)
 
 
 @bp.route("/ejercicio/<string:ejercicio_id>")
@@ -570,14 +580,4 @@ def ejercicio_detalle(ejercicio_id):
         ejercicio = {
             "error": "No se pudo obtener la información del ejercicio."}
 
-    return render_template("ejercicio_detalle.html", ejercicio=ejercicio)
-
-
-@bp.route("/manga")
-def manga():
-    return render_template("manga.html")
-
-
-@bp.route("/games")
-def games():
-    return render_template("games.html")
+    return render_template("ejercicio/ejercicio_detalle.html", ejercicio=ejercicio)
