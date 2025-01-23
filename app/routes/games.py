@@ -17,21 +17,28 @@ def add_game():
     db = get_firestore_db()
     game_data = request.form
 
+    # Añadir un nuevo documento y obtener su referencia
     game_ref = db.collection('games').document()
     game_ref.set({
         'title': game_data["title"],
         'released': game_data.get("released"),
         'rating': game_data.get("rating"),
-        'image_url': game_data.get("image_url")
+        'image_url': game_data.get("image_url"),
+        'id': game_ref.id  # Guardar el ID generado en el documento
     })
 
-    return redirect(url_for("routes.library"))
+    return redirect(url_for("library.library"))
 
 
 @games_bp.route("/game/<game_id>")
 def game_details(game_id):
     db = get_firestore_db()
-    game = db.collection('games').document(game_id).get().to_dict()
+    game_doc = db.collection('games').document(game_id).get()
+
+    if not game_doc.exists:
+        return f"El juego con ID {game_id} no existe.", 404
+
+    game = game_doc.to_dict()
     return render_template("games/game_details.html", game=game)
 
 
@@ -64,6 +71,10 @@ def search_game():
         response = requests.get(url, params=params)
         if response.status_code == 200:
             games = response.json().get("results", [])
+            # Asegúrate de que cada juego tenga un 'id' (si RAWG no lo proporciona, genera uno temporal)
+            for game in games:
+                # Usa 'slug' como ID alternativo si existe
+                game['id'] = game.get('id', game.get('slug', 'temp-id'))
             return render_template("games/game_results.html", games=games)
         else:
             return f"Error al conectar con la API de RAWG: {response.status_code}", 500

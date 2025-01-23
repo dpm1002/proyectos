@@ -19,7 +19,7 @@ def add_manga():
         'image_url': manga_data.get("image_url")
     })
 
-    return redirect(url_for("routes.library"))
+    return redirect(url_for("library.library"))
 
 
 @manga_bp.route("/manga/<manga_id>")

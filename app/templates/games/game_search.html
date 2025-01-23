@@ -3,14 +3,9 @@
 {% block content %}
 <div class="text-center">
     <h1>Buscar Videojuegos</h1>
-    <form method="POST" action="/search_game" class="mt-4">
+    <form method="POST" action="{{ url_for('games.search_game') }}" class="mt-4">
         <div class="mb-3">
-            <input 
-                type="text" 
-                class="form-control" 
-                name="query" 
-                placeholder="Título del videojuego..." 
-                required>
+            <input type="text" class="form-control" name="query" placeholder="Título del videojuego..." required>
         </div>
         <button type="submit" class="btn btn-primary">Buscar</button>
     </form>

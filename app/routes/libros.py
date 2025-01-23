@@ -24,7 +24,7 @@ def add_book():
     # Guardar el ID generado en el documento
     doc_ref[1].update({'id': doc_ref[1].id})
 
-    return redirect(url_for("routes.library"))
+    return redirect(url_for("library.library"))
 
 
 @books_bp.route("/book/<book_id>/update", methods=["POST"])
