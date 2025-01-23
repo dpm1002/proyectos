@@ -37,7 +37,12 @@ def index():
 def library():
     db = current_app.firestore_db
 
-    books = [doc.to_dict() for doc in db.collection('books').stream()]
+    books = []
+    for doc in db.collection('books').stream():
+        book = doc.to_dict()
+        book['id'] = doc.id  # Asegúrate de incluir el ID
+        books.append(book)
+
     mangas = [doc.to_dict() for doc in db.collection('mangas').stream()]
     games = [doc.to_dict() for doc in db.collection('games').stream()]
 
@@ -49,8 +54,9 @@ def add_book():
     db = current_app.firestore_db
     book_data = request.form
 
-    book_ref = db.collection('books').document()
-    book_ref.set({
+    # Añadir un nuevo documento con un ID generado automáticamente
+    book_ref = db.collection('books')
+    doc_ref = book_ref.add({
         'title': book_data["title"],
         'author': book_data["author"],
         'series': book_data.get("series"),
@@ -58,6 +64,9 @@ def add_book():
         'description': book_data.get("description"),
         'image_url': book_data.get("image_url")
     })
+
+    # Guardar el ID generado en el documento
+    doc_ref[1].update({'id': doc_ref[1].id})
 
     return redirect(url_for("routes.library"))
 
@@ -84,6 +93,7 @@ def update_book(book_id):
 @bp.route("/book/<string:book_id>", methods=["GET", "POST"])
 def book_details(book_id):
     db = current_app.firestore_db
+    print(f"Obteniendo libro con ID: {book_id}")
 
     if request.method == "POST":
         user_rating = request.form.get("user_rating")
@@ -162,6 +172,18 @@ def add_game():
     })
 
     return redirect(url_for("routes.library"))
+
+
+@bp.route("/book/<string:book_id>/update_genres", methods=["POST"])
+def update_book_genres(book_id):
+    db = current_app.firestore_db
+    genres = request.form.get("genres")
+
+    db.collection('books').document(book_id).update({
+        'genres': genres
+    })
+
+    return redirect(url_for("routes.book_details", book_id=book_id))
 
 
 @bp.route("/game/<game_id>")
@@ -394,6 +416,7 @@ def search_manga(query):
 def libros():
     db = current_app.firestore_db
     books = [doc.to_dict() for doc in db.collection('books').stream()]
+    print("IDs disponibles:", books)
     return render_template("libros/libros.html", books=books)
 
 
