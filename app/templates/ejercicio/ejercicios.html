@@ -3,7 +3,7 @@
 {% block content %}
 <h1 class="text-center mt-4">Ejercicios Guardados</h1>
 
-<form method="GET" action="{{ url_for('routes.buscar_ejercicio') }}">
+<form method="GET" action="{{ url_for('ejercicios.buscar_ejercicio') }}">
     <div class="form-group">
         <input type="text" class="form-control" name="termino" placeholder="Buscar ejercicio por nombre o músculo">
     </div>
@@ -29,7 +29,7 @@
                 <ul class="list-group">
                     {% for ejercicio in lista.ejercicios %}
                     <li class="list-group-item">
-                        <a href="{{ url_for('routes.ejercicio_detalle', ejercicio_id=ejercicio.id) }}">
+                        <a href="{{ url_for('ejercicios.ejercicio_detalle', ejercicio_id=ejercicio.id) }}">
                             <strong>{{ ejercicio.name }}</strong>
                         </a>
                     </li>

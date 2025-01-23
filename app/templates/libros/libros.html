@@ -19,7 +19,7 @@
         {% for book in books %}
         <div class="col-md-4">
             <div class="card mb-4">
-                <a href="{{ url_for('routes.book_details', book_id=book.id) }}" target="_blank">
+                <a href="{{ url_for('libros.book_details', book_id=book.id) }}" target="_blank">
                     <img src="{{ book.image_url if book.image_url else '/static/no_image.png' }}" class="card-img-top"
                         alt="{{ book.title }}">
                 </a>

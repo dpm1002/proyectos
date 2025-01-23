@@ -23,7 +23,7 @@
 
             <!-- Botón para actualizar los datos -->
             <h4>Actualizar Información Personal</h4>
-            <form method="POST" action="{{ url_for('routes.update_book', book_id=book.id) }}">
+            <form method="POST" action="{{ url_for('libros.update_book', book_id=book.id) }}">
                 <div class="mb-3">
                     <label for="user_rating" class="form-label">Valoración (0-10):</label>
                     <input type="number" class="form-control" id="user_rating" name="user_rating" min="0" max="10"
@@ -50,7 +50,7 @@
             </form>
             <h4>Actualizar Géneros</h4>
             <h4>Actualizar Géneros</h4>
-            <form method="POST" action="{{ url_for('routes.update_book_genres', book_id=book.id) }}">
+            <form method="POST" action="{{ url_for('libros.update_book_genres', book_id=book.id) }}">
                 <input type="text" class="form-control" name="genres" value="{{ book.genres }}"
                     placeholder="Ejemplo: Ficción, Fantasía, Aventura">
                 <button type="submit" class="btn btn-primary mt-3">Guardar</button>

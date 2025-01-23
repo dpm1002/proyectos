@@ -9,31 +9,31 @@
         <p>Explora nuestro catálogo, guarda tus favoritos y mantén todo organizado.</p>
         <div class="d-flex justify-content-center mt-4">
             <!-- Botón de Libros -->
-            <a href="{{ url_for('routes.libros') }}"
+            <a href="{{ url_for('libros.libros') }}"
                 class="btn btn-primary btn-lg mx-2 d-flex align-items-center justify-content-center">
                 <i class="fas fa-book me-2"></i> Libros
             </a>
             <!-- Botón de Mangas -->
-            <a href="{{ url_for('routes.manga') }}"
+            <a href="{{ url_for('manga.manga') }}"
                 class="btn btn-success btn-lg mx-2 d-flex align-items-center justify-content-center">
                 <i class="fas fa-dragon me-2"></i> Mangas
             </a>
             <!-- Botón de Videojuegos -->
-            <a href="{{ url_for('routes.games') }}"
+            <a href="{{ url_for('games.games') }}"
                 class="btn btn-info btn-lg mx-2 d-flex align-items-center justify-content-center">
                 <i class="fas fa-gamepad me-2"></i> Videojuegos
             </a>
             <!-- Botón de Spotify -->
-            <a href="{{ url_for('routes.spotify_login') }}"
+            <a href="{{ url_for('spotify.spotify_login') }}"
                 class="btn btn-warning btn-lg mx-2 d-flex align-items-center justify-content-center">
                 <i class="fas fa-music me-2"></i> Spotify
             </a>
             <!-- Boton de Ingresos -->
-            <a href="{{ url_for('routes.finanzas') }}" class="btn btn-warning btn-lg mx-2">
+            <a href="{{ url_for('finanzas.finanzas') }}" class="btn btn-warning btn-lg mx-2">
                 <i class="fas fa-euro-sign"></i> Gestión de Ingresos/Gastos
             </a>
             <!-- Boton de Ejercicios -->
-            <a href="{{ url_for('routes.ejercicios') }}" class="btn btn-warning btn-lg mx-2">
+            <a href="{{ url_for('ejercicios.ejercicios') }}" class="btn btn-warning btn-lg mx-2">
                 <i class="fas fa-euro-sign"></i> Gestión de Ejercicios
             </a>
         </div>

@@ -4,7 +4,7 @@
 <h1 class="text-center">Buscar Ejercicio</h1>
 
 <div class="container mt-4">
-    <form method="POST" action="{{ url_for('routes.buscar_ejercicio') }}">
+    <form method="POST" action="{{ url_for('ejercicios.buscar_ejercicio') }}">
         <div class="input-group mb-3">
             <input type="text" class="form-control" name="termino" placeholder="Buscar ejercicio por nombre o músculo"
                 value="{{ termino or '' }}">
@@ -23,7 +23,7 @@
             <p><strong>Músculo:</strong> {{ ejercicio.target }}</p>
             <p><strong>Equipo:</strong> {{ ejercicio.equipment }}</p>
             <img src="{{ ejercicio.gifUrl }}" alt="Imagen del ejercicio" class="img-fluid">
-            <form method="POST" action="{{ url_for('routes.agregar_ejercicio') }}">
+            <form method="POST" action="{{ url_for('ejercicios.agregar_ejercicio') }}">
                 <input type="hidden" name="ejercicio_id" value="{{ ejercicio.id }}">
                 <input type="hidden" name="nombre_ejercicio" value="{{ ejercicio.name }}">
                 <div class="input-group mt-2">
