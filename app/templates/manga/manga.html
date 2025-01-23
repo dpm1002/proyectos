@@ -3,7 +3,7 @@
 {% block content %}
 <div class="text-center">
     <h1>Buscar Manga</h1>
-    <form method="POST" action="/searchMANGA" class="mt-4">
+    <form method="POST" action="{{ url_for('manga.searchManga') }}" class="mt-4">
         <div class="mb-3">
             <input type="text" class="form-control" name="query" placeholder="Título del manga..." required>
         </div>

@@ -16,7 +16,8 @@ def add_manga():
         'original_language': manga_data.get("original_language", "ja"),
         'year': manga_data.get("year"),
         'content_rating': manga_data.get("content_rating", "safe"),
-        'image_url': manga_data.get("image_url")
+        'image_url': manga_data.get("image_url"),
+        'id': manga_ref.id
     })
 
     return redirect(url_for("library.library"))
@@ -25,7 +26,12 @@ def add_manga():
 @manga_bp.route("/manga/<manga_id>")
 def manga_details(manga_id):
     db = get_firestore_db()
-    manga = db.collection('mangas').document(manga_id).get().to_dict()
+    manga_doc = db.collection('mangas').document(manga_id).get()
+
+    if not manga_doc.exists:
+        return f"El manga con ID {manga_id} no existe.", 404
+
+    manga = manga_doc.to_dict()
     return render_template("manga/manga_details.html", manga=manga)
 
 

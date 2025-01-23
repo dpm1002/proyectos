@@ -1,16 +1,15 @@
 {% for manga in mangas %}
 <div class="col-md-4">
     <div class="card mb-4">
-        <img 
-            src="{{ manga.image_url if manga.image_url else '/static/no_image.png' }}" 
-            class="card-img-top" 
+        <img src="{{ manga.image_url if manga.image_url else '/static/no_image.png' }}" class="card-img-top"
             alt="{{ manga.title }}">
         <div class="card-body">
             <h5 class="card-title">{{ manga.title }}</h5>
-            <p class="card-text">{{ manga.description[:150] if manga.description else 'Sin descripción disponible' }}...</p>
+            <p class="card-text">{{ manga.description[:150] if manga.description else 'Sin descripción disponible' }}...
+            </p>
             <p class="card-text">Año: {{ manga.year }}</p>
             <p class="card-text">Clasificación: {{ manga.content_rating }}</p>
-            <form method="POST" action="/add_manga">
+            <form method="POST" action="{{ url_for('manga.add_manga') }}">
                 <input type="hidden" name="id" value="{{ manga.id }}">
                 <input type="hidden" name="title" value="{{ manga.title }}">
                 <input type="hidden" name="description" value="{{ manga.description }}">
